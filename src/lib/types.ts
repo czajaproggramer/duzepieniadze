@@ -155,6 +155,8 @@ export interface Settings {
   autoSendFollowUps: boolean
   /** Ile dni przed terminem wysyłać przypomnienie. */
   leadDays: number
+  /** Wzorzec treści przypomnienia, z tokenami {imie_psa}, {imie_wlasciciela}, {rasa}, {tygodnie}, {data}. */
+  reminderTemplate: string
 }
 
 export interface DB {

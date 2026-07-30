@@ -1,5 +1,5 @@
 import { breedById } from '../data/breeds'
-import { addWeeks, daysBetween, nowStamp, todayISO, weeksBetween } from './date'
+import { addWeeks, daysBetween, formatDateShort, nowStamp, todayISO, weeksBetween } from './date'
 import type { DB, FollowUp, Notification, Pet } from './types'
 import { uid } from './storage'
 
@@ -86,6 +86,22 @@ export function petSchedule(db: DB, pet: Pet, leadDays: number): PetSchedule {
     weeksSince: Math.max(0, weeksBetween(last, today)),
     state,
   }
+}
+
+/** Wypełnia wzorzec przypomnienia wartościami konkretnego harmonogramu psa. */
+export function renderReminderTemplate(template: string, s: PetSchedule): string {
+  const tpl = template ?? ''
+  const ownerFirstName = s.ownerName === '—' ? s.ownerName : s.ownerName.split(' ')[0]
+  const tokens: Record<string, string> = {
+    imie_psa: s.pet.name,
+    imie_wlasciciela: ownerFirstName,
+    rasa: s.breedName,
+    tygodnie: String(s.weeksSince),
+    data: s.dueDate ? formatDateShort(s.dueDate) : '—',
+  }
+  return tpl.replace(/\{(\w+)\}/g, (match, key) =>
+    key in tokens ? tokens[key] : match,
+  )
 }
 
 export function allSchedules(db: DB): PetSchedule[] {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, Icon, IconChip } from '../components/Icon'
 import { useToast } from '../components/Toast'
@@ -17,7 +17,8 @@ import {
   weekdayIndex,
 } from '../lib/date'
 import { OPENING_HOURS, openingLabel } from '../lib/availability'
-import { allSchedules, hasUpcomingVisit } from '../lib/followups'
+import { allSchedules, hasUpcomingVisit, renderReminderTemplate } from '../lib/followups'
+import type { PetSchedule } from '../lib/followups'
 import { plural, useStore } from '../lib/store'
 import type { Message, User } from '../lib/types'
 
@@ -91,7 +92,8 @@ export function Admin() {
             onClick={() => setTab('followupy')}
           >
             <Icon name="bell" size={17} />
-            Follow-upy {pendingFollowUps > 0 && <span className="count">{pendingFollowUps}</span>}
+            Przypomnienia{' '}
+            {pendingFollowUps > 0 && <span className="count">{pendingFollowUps}</span>}
           </button>
         </div>
 
@@ -99,7 +101,7 @@ export function Admin() {
         {tab === 'klienci' && <Clients />}
         {tab === 'wizyty' && <Visits />}
         {tab === 'wiadomosci' && <Messages />}
-        {tab === 'followupy' && <FollowUps />}
+        {tab === 'followupy' && <Reminders />}
       </div>
     </div>
   )
@@ -257,7 +259,10 @@ function DaySchedule({ onGo }: { onGo: (t: Tab) => void }) {
               const client = db.users.find((u) => u.id === a.clientId)
               const top = (start - openMin) * PX_PER_MIN
               const height = Math.max((end - start) * PX_PER_MIN, 38)
+              // Krótkie bloki nie mieszczą trzech linijek — skracamy układ,
+              // żeby tekst nigdy nie był przycięty (pełne dane zostają w tooltipie).
               const isCompact = height < 52
+              const showOwner = height >= 72
               return (
                 <div
                   key={a.id}
@@ -285,7 +290,7 @@ function DaySchedule({ onGo }: { onGo: (t: Tab) => void }) {
                       <div className="daycal-event-title">
                         {pet?.name} · {serviceById(a.serviceId)?.name}
                       </div>
-                      <div className="daycal-event-sub">{client?.name}</div>
+                      {showOwner && <div className="daycal-event-sub">{client?.name}</div>}
                     </>
                   )}
                 </div>
@@ -729,79 +734,97 @@ function Messages() {
   )
 }
 
-/* ─────────────────────── FOLLOW-UPY ─────────────────────── */
+/* ─────────────────────── PRZYPOMNIENIA ─────────────────────── */
 
-function FollowUps() {
-  const {
-    db,
-    runFollowUpScan,
-    sendPendingFollowUps,
-    dismissFollowUp,
-    requeueFollowUp,
-    setAutoSend,
-    setLeadDays,
-  } = useStore()
-  const [toast, showToast] = useToast()
+const REMINDER_VARIABLES: { token: string; label: string }[] = [
+  { token: '{imie_psa}', label: 'imię psa' },
+  { token: '{imie_wlasciciela}', label: 'imię właściciela' },
+  { token: '{rasa}', label: 'rasa' },
+  { token: '{tygodnie}', label: 'ile tygodni' },
+  { token: '{data}', label: 'data wizyty' },
+]
+
+/** Przykładowe dane do podglądu wzorca, gdy w bazie nie ma jeszcze żadnego pupila. */
+const SAMPLE_SCHEDULE: PetSchedule = {
+  pet: { id: '', ownerId: '', name: 'Reksio', breedId: '', weightKg: 0 },
+  ownerId: '',
+  ownerName: 'Anna Kowalska',
+  breedName: 'Owczarek',
+  intervalWeeks: 6,
+  lastVisit: null,
+  dueDate: todayISO(),
+  daysUntilDue: 0,
+  weeksSince: 6,
+  state: 'po-terminie',
+}
+
+function Reminders() {
+  const { db, setLeadDays, setReminderTemplate } = useStore()
+  const [template, setTemplate] = useState(db.settings.reminderTemplate ?? '')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    setTemplate(db.settings.reminderTemplate ?? '')
+  }, [db.settings.reminderTemplate])
 
   const schedules = allSchedules(db)
-  const pending = db.followUps.filter((f) => f.status === 'pending')
-  const sent = db.followUps.filter((f) => f.status === 'sent')
+  const overdue = schedules.filter(
+    (s) => s.state === 'po-terminie' && !hasUpcomingVisit(db, s.pet.id),
+  )
 
-  const petName = (id: string) => db.pets.find((p) => p.id === id)?.name ?? '—'
-  const ownerName = (id: string) => db.users.find((u) => u.id === id)?.name ?? '—'
+  const sample = overdue[0] ?? schedules[0]
+
+  const insertVariable = (token: string) => {
+    const el = textareaRef.current
+    let next = template
+    if (el) {
+      const start = el.selectionStart ?? template.length
+      const end = el.selectionEnd ?? template.length
+      next = template.slice(0, start) + token + template.slice(end)
+    } else {
+      next = template + token
+    }
+    setTemplate(next)
+  }
+
+  const commitTemplate = () => {
+    if (template !== db.settings.reminderTemplate) setReminderTemplate(template)
+  }
 
   return (
     <>
       <div className="card" style={{ marginBottom: 24 }}>
-        <h3 className="mt-0 mb-0">Automatyczne przypomnienia o strzyżeniu</h3>
+        <h3 className="mt-0 mb-0">Wzorzec przypomnienia</h3>
         <p className="text-muted small" style={{ maxWidth: '64ch' }}>
-          System sam liczy, kiedy futro każdego psa odrośnie, na podstawie tempa wzrostu
-          okrywy jego rasy i daty ostatniej wizyty. Skan uruchamia się automatycznie przy
-          każdym wejściu do aplikacji.
+          Treść, którą klient zobaczy jako przypomnienie o kolejnym strzyżeniu. Użyj
+          zmiennych w klamrach — zostaną podmienione na dane konkretnego psa.
         </p>
 
-        <div className="flex mt-2" style={{ gap: 16 }}>
-          <button
-            className="btn btn-outline"
-            onClick={() => {
-              const r = runFollowUpScan()
-              showToast(
-                r.created > 0
-                  ? `Wykryto ${r.created} ${plural(r.created, 'psa', 'psy', 'psów')} do przypomnienia.`
-                  : 'Brak nowych follow-upów, wszystko na bieżąco.',
-              )
-            }}
-          >
-            <Icon name="search" size={16} />
-            Sprawdź follow-upy
-          </button>
+        <textarea
+          ref={textareaRef}
+          className="reminder-template-input"
+          value={template}
+          onChange={(e) => setTemplate(e.target.value)}
+          onBlur={commitTemplate}
+          rows={3}
+          placeholder="np. {imie_psa} oczekuje na wizytę"
+        />
 
-          <button
-            className="btn btn-primary"
-            disabled={pending.length === 0}
-            onClick={() => {
-              const n = sendPendingFollowUps()
-              showToast(
-                n > 0
-                  ? `Wysłano ${n} ${plural(n, 'przypomnienie', 'przypomnienia', 'przypomnień')}.`
-                  : 'Nie ma czego wysyłać.',
-              )
-            }}
-          >
-            <Icon name="send" size={16} />
-            Wyślij follow-upy {pending.length > 0 && `(${pending.length})`}
-          </button>
+        <div className="reminder-var-picker">
+          {REMINDER_VARIABLES.map((v) => (
+            <button
+              key={v.token}
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => insertVariable(v.token)}
+            >
+              {v.token}
+              <span className="text-faint"> · {v.label}</span>
+            </button>
+          ))}
+        </div>
 
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={db.settings.autoSendFollowUps}
-              onChange={(e) => setAutoSend(e.target.checked)}
-            />
-            <span className="track" />
-            Wysyłaj automatycznie
-          </label>
-
+        <div className="flex mt-2" style={{ gap: 16, alignItems: 'center' }}>
           <label className="switch">
             Wyprzedzenie:
             <select
@@ -821,158 +844,65 @@ function FollowUps() {
               ))}
             </select>
           </label>
+          <button className="btn btn-primary btn-sm" onClick={commitTemplate}>
+            Zapisz wzorzec
+          </button>
         </div>
 
-        <p className="text-faint small mt-2 mb-0">
-          Demo: „wysyłka" oznacza dostarczenie wiadomości do skrzynki klienta w jego
-          panelu. Podpięcie prawdziwego e-maila lub SMS-a to wymiana jednej funkcji.
-        </p>
+        <div className="mt-2">
+          <span className="text-faint small">Podgląd:</span>
+          <div className="quote-box mt-1">
+            {renderReminderTemplate(template, sample ?? SAMPLE_SCHEDULE)}
+          </div>
+        </div>
       </div>
 
-      <h3>Kolejka do wysyłki ({pending.length})</h3>
-      {pending.length === 0 ? (
+      <h3>Psy po terminie ({overdue.length})</h3>
+      {overdue.length === 0 ? (
         <div className="empty">
           <IconChip name="checkCircle" />
-          Kolejka jest pusta, żaden pies nie czeka na przypomnienie.
+          Żaden pies nie czeka na przypomnienie — wszystko na bieżąco.
         </div>
       ) : (
-        <div className="list">
-          {pending.map((f) => (
-            <article key={f.id} className="row-card unread">
-              <Avatar label={petName(f.petId)} />
-              <div className="grow">
-                <h4>
-                  {petName(f.petId)} · {breedById(f.breedId).name}
-                </h4>
-                <div className="sub">
-                  {ownerName(f.clientId)} · termin: {formatDate(f.dueDate)} (
-                  {formatRelative(f.dueDate)})
-                </div>
-                <div className="quote-box mt-1">{f.text}</div>
-              </div>
-              <button className="btn btn-ghost btn-sm" onClick={() => dismissFollowUp(f.id)}>
-                Odrzuć
-              </button>
-            </article>
-          ))}
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Pies</th>
+                <th>Rasa</th>
+                <th>Właściciel</th>
+                <th>Ostatnia wizyta</th>
+                <th>Termin minął</th>
+                <th>Treść przypomnienia</th>
+              </tr>
+            </thead>
+            <tbody>
+              {overdue.map((s) => (
+                <tr key={s.pet.id}>
+                  <td>
+                    <strong>{s.pet.name}</strong>
+                  </td>
+                  <td>{s.breedName}</td>
+                  <td>{s.ownerName}</td>
+                  <td>{s.lastVisit ? formatDateShort(s.lastVisit) : '—'}</td>
+                  <td>
+                    {s.dueDate ? (
+                      <>
+                        {formatDateShort(s.dueDate)}
+                        <br />
+                        <span className="text-faint small">{formatRelative(s.dueDate)}</span>
+                      </>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+                  <td className="small">{renderReminderTemplate(template, s)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-
-      <h3 className="mt-3">Harmonogram wg tempa wzrostu futra</h3>
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Pies</th>
-              <th>Rasa</th>
-              <th>Właściciel</th>
-              <th>Interwał</th>
-              <th>Ostatnia wizyta</th>
-              <th>Kolejne strzyżenie</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {schedules.map((s) => (
-              <tr key={s.pet.id}>
-                <td>
-                  <strong>{s.pet.name}</strong>
-                </td>
-                <td>{s.breedName}</td>
-                <td>{s.ownerName}</td>
-                <td>co {s.intervalWeeks} tyg.</td>
-                <td>{s.lastVisit ? formatDateShort(s.lastVisit) : '—'}</td>
-                <td>
-                  {s.dueDate ? (
-                    <>
-                      {formatDateShort(s.dueDate)}
-                      <br />
-                      <span className="text-faint small">{formatRelative(s.dueDate)}</span>
-                    </>
-                  ) : (
-                    '—'
-                  )}
-                </td>
-                <td>
-                  {hasUpcomingVisit(db, s.pet.id) ? (
-                    <span className="badge badge-accent">ma już termin</span>
-                  ) : (
-                    <>
-                      {s.state === 'po-terminie' && (
-                        <span className="badge badge-rose">po terminie</span>
-                      )}
-                      {s.state === 'zbliza-sie' && (
-                        <span className="badge badge-butter">zbliża się</span>
-                      )}
-                      {s.state === 'ok' && <span className="badge badge-mint">ok</span>}
-                      {s.state === 'brak-historii' && (
-                        <span className="badge badge-grey">brak historii</span>
-                      )}
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="grid grid-2 mt-3" style={{ alignItems: 'start' }}>
-        <div className="card">
-          <h3 className="mt-0">Wysłane przypomnienia ({sent.length})</h3>
-          {sent.length === 0 ? (
-            <p className="text-muted">Jeszcze nic nie poszło.</p>
-          ) : (
-            <div className="list">
-              {sent
-                .slice()
-                .reverse()
-                .slice(0, 8)
-                .map((f) => (
-                  <div key={f.id} className="row-card">
-                    <IconChip name="send" />
-                    <div className="grow">
-                      <h4>{petName(f.petId)}</h4>
-                      <div className="sub">
-                        {ownerName(f.clientId)} · {f.sentAt ? formatStamp(f.sentAt) : '—'} ·{' '}
-                        {f.auto ? 'automat' : 'ręcznie'}
-                      </div>
-                    </div>
-                    <div className="row-actions">
-                      <span className="badge badge-mint">dostarczone</span>
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => {
-                          requeueFollowUp(f.id)
-                          showToast('Wróciło do kolejki, możesz wysłać ponownie.')
-                        }}
-                      >
-                        Ponów
-                      </button>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-
-        <div className="card">
-          <h3 className="mt-0">Log automatu</h3>
-          {db.followUpLog.length === 0 ? (
-            <p className="text-muted">Brak wpisów.</p>
-          ) : (
-            <div className="log-list">
-              {db.followUpLog.map((l) => (
-                <div key={l.id} className="log-item">
-                  <time>{formatStamp(l.at)}</time>
-                  {l.text}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      {toast}
     </>
   )
 }

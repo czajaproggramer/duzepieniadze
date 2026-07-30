@@ -61,6 +61,7 @@ interface StoreValue {
   requeueFollowUp: (id: string) => void
   setAutoSend: (value: boolean) => void
   setLeadDays: (days: number) => void
+  setReminderTemplate: (value: string) => void
   // szkic rezerwacji / onboarding
   draft: BookingDraft | null
   startDraft: (init: BookingDraft) => void
@@ -362,6 +363,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     setLeadDays(days) {
       setDb((p) => ({ ...p, settings: { ...p.settings, leadDays: days } }))
+    },
+
+    setReminderTemplate(value) {
+      setDb((p) => ({ ...p, settings: { ...p.settings, reminderTemplate: value } }))
     },
 
     draft,

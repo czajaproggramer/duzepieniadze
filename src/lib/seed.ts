@@ -207,7 +207,12 @@ export function seedDB(): DB {
     messages,
     followUps: [],
     notifications: [],
-    settings: { autoSendFollowUps: true, leadDays: 7 },
+    settings: {
+      autoSendFollowUps: true,
+      leadDays: 7,
+      reminderTemplate:
+        'Cześć {imie_wlasciciela}! Futro {imie_psa} ({rasa}) już odrosło — minęło {tygodnie} tyg. od ostatniej wizyty. Zapraszamy na strzyżenie ({data}). 🐾',
+    },
     followUpLog: [],
   }
 }

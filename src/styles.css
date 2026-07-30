@@ -2359,3 +2359,30 @@ tbody tr:last-child td {
     transition: none !important;
   }
 }
+
+/* ─────────────────────── PRZYPOMNIENIA: wzorzec wiadomości ─────────────────────── */
+
+.reminder-template-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 64px;
+}
+
+.reminder-template-input:focus {
+  outline: none;
+  border-color: var(--accent, #c98a4b);
+}
+
+.reminder-var-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}

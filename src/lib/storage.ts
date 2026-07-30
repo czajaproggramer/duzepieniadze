@@ -3,7 +3,7 @@ import type { BookingDraft, DB } from './types'
 const KEY = 'kael-pet-grooming::db'
 const DRAFT_KEY = 'kael-pet-grooming::draft'
 
-export const DB_VERSION = 5
+export const DB_VERSION = 6
 
 export function uid(prefix = 'id'): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}${Date.now().toString(36).slice(-3)}`

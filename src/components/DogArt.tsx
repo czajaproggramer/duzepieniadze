@@ -13,10 +13,10 @@ interface Palette {
 }
 
 export const PALETTES: Record<string, Palette> = {
-  cream: { bg: '#fbede0', fur: '#f0dac2', furShade: '#dcc0a2', accent: '#e5814f' },
-  apricot: { bg: '#fdecdf', fur: '#e8b489', furShade: '#d2946a', accent: '#d3672f' },
-  snow: { bg: '#f7f2ec', fur: '#fbf7f2', furShade: '#e4dace', accent: '#e5814f' },
-  chocolate: { bg: '#fbede0', fur: '#b98462', furShade: '#96654a', accent: '#d3672f' },
+  cream: { bg: '#f8e6e9', fur: '#f0dac2', furShade: '#dcc0a2', accent: '#d98996' },
+  apricot: { bg: '#f5dce0', fur: '#e8b489', furShade: '#d2946a', accent: '#c46d7a' },
+  snow: { bg: '#fdf4f6', fur: '#fbf7f2', furShade: '#e4dace', accent: '#d98996' },
+  chocolate: { bg: '#f8e6e9', fur: '#b98462', furShade: '#96654a', accent: '#c46d7a' },
 }
 
 /** Zamknięta „puchata" ścieżka. Im większe `amp`, tym bardziej rozczochrane futro. */
@@ -171,14 +171,14 @@ export function HeroArt({ className }: { className?: string }) {
       role="img"
       aria-label="Ilustracja psa po strzyżeniu w salonie"
     >
-      <rect x="-200" y="-200" width="860" height="760" fill="#f6ddc6" />
+      <rect x="-200" y="-200" width="860" height="760" fill="#f0d6da" />
 
-      <circle cx="72" cy="62" r="36" fill="#e5814f" opacity="0.16" />
+      <circle cx="72" cy="62" r="36" fill="#d98996" opacity="0.16" />
       <circle cx="398" cy="92" r="22" fill="#ffffff" opacity="0.5" />
-      <circle cx="410" cy="240" r="14" fill="#e5814f" opacity="0.2" />
+      <circle cx="410" cy="240" r="14" fill="#d98996" opacity="0.2" />
       <path
         d="M 40 300 q 20 -26 40 0"
-        stroke="#e5814f"
+        stroke="#d98996"
         strokeWidth="4"
         fill="none"
         strokeLinecap="round"
@@ -193,13 +193,13 @@ export function HeroArt({ className }: { className?: string }) {
       </g>
 
       <g opacity="0.2">
-        <PawMark x={66} y={318} s={0.8} fill="#c96a34" />
-        <PawMark x={402} y={318} s={0.65} fill="#c96a34" />
+        <PawMark x={66} y={318} s={0.8} fill="#c46d7a" />
+        <PawMark x={402} y={318} s={0.65} fill="#c46d7a" />
       </g>
 
-      <rect x="70" y="268" width="320" height="16" rx="8" fill="#e5814f" />
-      <rect x="150" y="284" width="14" height="52" rx="7" fill="#d3672f" />
-      <rect x="296" y="284" width="14" height="52" rx="7" fill="#d3672f" />
+      <rect x="70" y="268" width="320" height="16" rx="8" fill="#d98996" />
+      <rect x="150" y="284" width="14" height="52" rx="7" fill="#c46d7a" />
+      <rect x="296" y="284" width="14" height="52" rx="7" fill="#c46d7a" />
 
       <g transform="translate(30 20)">
         <HeroDog />
@@ -207,15 +207,15 @@ export function HeroArt({ className }: { className?: string }) {
 
       <g
         transform="translate(348 192) rotate(-18)"
-        stroke="#a8481a"
+        stroke="#a65a66"
         strokeWidth="5"
         fill="none"
         strokeLinecap="round"
       >
         <path d="M 0 0 L 30 30" />
         <path d="M 30 0 L 0 30" />
-        <circle cx="-5" cy="-5" r="6.5" fill="#f6ddc6" />
-        <circle cx="35" cy="-5" r="6.5" fill="#f6ddc6" />
+        <circle cx="-5" cy="-5" r="6.5" fill="#f0d6da" />
+        <circle cx="35" cy="-5" r="6.5" fill="#f0d6da" />
       </g>
     </svg>
   )
@@ -248,8 +248,8 @@ function HeroDog() {
         strokeLinecap="round"
       />
       <g transform="translate(240 62)">
-        <path d="M 0 0 q -17 -13 -17 4 q 0 17 17 4 z" fill="#e5814f" />
-        <path d="M 0 0 q 17 -13 17 4 q 0 17 -17 4 z" fill="#e5814f" />
+        <path d="M 0 0 q -17 -13 -17 4 q 0 17 17 4 z" fill="#d98996" />
+        <path d="M 0 0 q 17 -13 17 4 q 0 17 -17 4 z" fill="#d98996" />
         <circle cx="0" cy="4" r="5.5" fill="#fff" opacity="0.9" />
       </g>
     </g>
@@ -260,9 +260,9 @@ function HeroDog() {
 export function PortraitArt() {
   return (
     <svg viewBox="0 0 400 460" role="img" aria-label="Portret groomerki z psem">
-      <rect width="400" height="460" fill="#fbede0" />
-      <circle cx="200" cy="150" r="94" fill="#f6ddc6" />
-      <circle cx="200" cy="146" r="66" fill="#f2d9bd" />
+      <rect width="400" height="460" fill="#f8e6e9" />
+      <circle cx="200" cy="150" r="94" fill="#f0d6da" />
+      <circle cx="200" cy="146" r="66" fill="#e8c8ce" />
       <path
         d="M 134 140 q 4 -78 66 -78 q 62 0 66 78 q -18 -34 -66 -34 q -48 0 -66 34 z"
         fill="#4a3a30"
@@ -276,7 +276,7 @@ export function PortraitArt() {
         fill="none"
         strokeLinecap="round"
       />
-      <path d="M 90 460 q 0 -140 110 -140 q 110 0 110 140 z" fill="#e5814f" />
+      <path d="M 90 460 q 0 -140 110 -140 q 110 0 110 140 z" fill="#d98996" />
       <path d="M 200 320 q -28 44 0 76 q 28 -32 0 -76" fill="#fff" opacity="0.25" />
       <g transform="translate(258 330)">
         <ellipse cx="0" cy="30" rx="52" ry="44" fill="#f0dac2" />
@@ -289,8 +289,8 @@ export function PortraitArt() {
         <path d="M -4 2 h 8 l -4 5 z" fill="#332b26" />
       </g>
       <g opacity="0.18">
-        <PawMark x={62} y={80} s={1.1} fill="#c96a34" />
-        <PawMark x={338} y={128} s={0.8} fill="#c96a34" />
+        <PawMark x={62} y={80} s={1.1} fill="#c46d7a" />
+        <PawMark x={338} y={128} s={0.8} fill="#c46d7a" />
       </g>
     </svg>
   )

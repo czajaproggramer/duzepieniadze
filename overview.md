@@ -4,8 +4,8 @@ Dokument techniczny opisujący, **jak działa aplikacja**. Uzupełnia [README.md
 (który jest bardziej marketingowo-funkcjonalny). Utrzymuj ten plik na bieżąco — patrz
 instrukcja w [CLAUDE.md](CLAUDE.md).
 
-> Ostatnia istotna zmiana: anonimizacja danych demo (branding, kontakty, adresy w
-> `src/data/site.ts`; klucze `localStorage` → `salon-demo::*`, `DB_VERSION = 7`).
+> Ostatnia istotna zmiana: design system → **pudrowy róż** (blush + Manrope;
+> tokeny w `styles.css`, ilustracje `DogArt`, favicon).
 
 ---
 
@@ -174,7 +174,8 @@ CSS bloków: reguły `.daycal-*` w [src/styles.css](src/styles.css).
 - [src/components/PetForm.tsx](src/components/PetForm.tsx) — formularz pupila.
 - [src/components/Toast.tsx](src/components/Toast.tsx) — hook `useToast()` + komponent.
 - **Style:** jeden plik [src/styles.css](src/styles.css), tokeny kolorów/typografii na górze.
-  Terakota `#e5814f` (tło + akcent), krem, biel kart, czerń CTA. Playfair Display / Inter / Caveat.
+  Pudrowy róż `#d98996` (akcent + rama `#e8b8be`), kremowo-różowa biel, soft charcoal CTA.
+  Playfair Display / Manrope / Caveat.
 
 ---
 

@@ -3,7 +3,7 @@
 # konfiguracji Workers z sekcją [assets], a nie `pages_build_output_dir`.
 # Nazwa Workera = pierwszy człon adresu <name>.<subdomena>.workers.dev.
 # Musi się zgadzać z nazwą projektu w Cloudflare, inaczej CI ją nadpisuje.
-name = "demogrooming"
+name = "demo-grooming"
 compatibility_date = "2024-11-01"
 
 [assets]

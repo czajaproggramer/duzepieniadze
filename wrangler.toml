@@ -1,6 +1,12 @@
-# Konfiguracja Cloudflare Pages.
-# `pages_build_output_dir` sprawia, że Wrangler traktuje projekt jako Pages
-# i deployuje zawartość katalogu z buildem (npm run build → dist).
+# Konfiguracja Cloudflare (Worker serwujący statyczne pliki — Static Assets).
+# Projekt podpięty przez Git uruchamia `npx wrangler deploy`, dlatego używamy
+# konfiguracji Workers z sekcją [assets], a nie `pages_build_output_dir`.
 name = "kael-pet-grooming"
 compatibility_date = "2024-11-01"
-pages_build_output_dir = "dist"
+
+[assets]
+# Katalog z buildem (npm run build → dist).
+directory = "./dist"
+# SPA: każde nieznane żądanie (np. /admin, /konto) dostaje index.html z 200,
+# dzięki czemu React Router obsłuży trasę zamiast zwracać 404.
+not_found_handling = "single-page-application"

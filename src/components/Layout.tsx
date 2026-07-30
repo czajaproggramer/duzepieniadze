@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { BOOKSY_STATS } from '../data/reviews'
+import { REVIEW_STATS } from '../data/reviews'
+import { SITE } from '../data/site'
 import { useStore } from '../lib/store'
 import { Icon } from './Icon'
 
@@ -60,8 +61,8 @@ function Nav() {
             <Icon name="paw" size={30} strokeWidth={1.3} />
           </span>
           <span className="logo-word">
-            <span>Kael</span>
-            <span>Pet Grooming</span>
+            <span>{SITE.brandLine1}</span>
+            <span>{SITE.brandLine2}</span>
           </span>
         </Link>
 
@@ -145,8 +146,8 @@ function Footer() {
                 <Icon name="paw" size={30} strokeWidth={1.3} />
               </span>
               <span className="logo-word">
-                <span>Kael</span>
-                <span>Pet Grooming</span>
+                <span>{SITE.brandLine1}</span>
+                <span>{SITE.brandLine2}</span>
               </span>
             </Link>
             <p className="text-muted small" style={{ maxWidth: '38ch' }}>
@@ -154,13 +155,14 @@ function Footer() {
               bez stresu, z dbałością o każdy detal.
             </p>
             <a
-              href={BOOKSY_STATS.url}
+              href={REVIEW_STATS.url}
               target="_blank"
               rel="noreferrer"
               className="small"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
             >
-              {BOOKSY_STATS.rating}/5 na Booksy ({BOOKSY_STATS.count} opinii)
+              {REVIEW_STATS.rating}/5 na {REVIEW_STATS.platformLabel} ({REVIEW_STATS.count}{' '}
+              opinii)
               <Icon name="external" size={14} />
             </a>
           </div>
@@ -168,13 +170,13 @@ function Footer() {
           <div>
             <h4>Kontakt</h4>
             <ul>
-              <li>ul. Siodlarska 12, lokal 2</li>
-              <li>01-461 Warszawa, Bemowo</li>
+              <li>{SITE.addressLine1}</li>
+              <li>{SITE.addressLine2}</li>
               <li>
-                <a href="tel:+48500100200">+48 500 100 200</a>
+                <a href={`tel:${SITE.phoneTel}`}>{SITE.phone}</a>
               </li>
               <li>
-                <a href="mailto:kontakt@kaelpetgrooming.pl">kontakt@kaelpetgrooming.pl</a>
+                <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
               </li>
             </ul>
           </div>
@@ -193,7 +195,9 @@ function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} Kael Pet Grooming, Oksana Kalinchuk</span>
+          <span>
+            © {new Date().getFullYear()} {SITE.fullName}, {SITE.groomerFullName}
+          </span>
           <span>Projekt demonstracyjny. Dane kontaktowe do uzupełnienia.</span>
         </div>
       </div>

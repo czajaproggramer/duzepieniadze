@@ -37,7 +37,7 @@ export interface Service {
   breedIds: string[]
   category: 'strzyzenie' | 'kapiel' | 'dodatki'
   popular?: boolean
-  /** true = cena orientacyjna (nie potwierdzona w cenniku Booksy). */
+  /** true = cena orientacyjna (dane demonstracyjne). */
   estimatedPrice?: boolean
 }
 

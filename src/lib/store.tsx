@@ -15,7 +15,7 @@ import { clearDB, loadDB, loadDraft, saveDB, saveDraft, uid } from './storage'
 import { seedDB } from './seed'
 import type { Appointment, BookingDraft, DB, Message, Pet, User } from './types'
 
-const SESSION_KEY = 'kael-pet-grooming::session'
+const SESSION_KEY = 'salon-demo::session'
 
 interface StoreValue {
   db: DB

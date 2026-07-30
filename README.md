@@ -1,4 +1,4 @@
-# Kael Pet Grooming — landing page + system rezerwacji
+# Salon Demo — landing page + system rezerwacji
 
 Demo salonu pielęgnacji psów: strona sprzedażowa + system rezerwacji z kontami
 klientów, profilami pupili, panelem administratora i **automatycznymi follow-upami
@@ -32,7 +32,7 @@ Aplikacja: http://localhost:5173
 | Rola | Login | Hasło |
 | --- | --- | --- |
 | Klient (2 psy: Fibi, Bruno) | `jan@example.com` | `demo1234` |
-| Administrator salonu | `admin@kaelpetgrooming.pl` | `admin1234` |
+| Administrator salonu | `admin@example.com` | `admin1234` |
 
 Na ekranie logowania są przyciski do logowania jednym kliknięciem.
 Pasek u góry strony pozwala zresetować dane demo do stanu początkowego.
@@ -47,9 +47,9 @@ Pasek u góry strony pozwala zresetować dane demo do stanu początkowego.
 - „O mnie",
 - **kalkulator odstępu między wizytami** (rasa + data ostatniego strzyżenia
   → zalecany termin) w pomarańczowym bloku,
-- „Dlaczego Kael" — 4 wyróżniki,
+- „Dlaczego Demo" — 4 wyróżniki,
 - cennik w 3 kategoriach,
-- najlepsze opinie i ocena z Booksy,
+- najlepsze opinie (dane demonstracyjne),
 - przed i po — przeciągany suwak porównania,
 - kalendarz z realną dostępnością,
 - ciemny blok CTA,
@@ -105,7 +105,7 @@ sprowadza się do podmiany `sendFollowUps` w `src/lib/followups.ts`.
 
 ```
 src/
-  data/      breeds.ts (tempo wzrostu futra), services.ts (cennik), reviews.ts
+  data/      breeds.ts (tempo wzrostu futra), services.ts (cennik), reviews.ts, site.ts (branding)
   lib/       types.ts, store.tsx (stan + akcje), storage.ts, seed.ts,
              followups.ts (silnik), availability.ts (grafik), date.ts
   components/ Layout, Calendar, BeforeAfter, DogArt (ilustracje SVG), PetForm, Toast
@@ -117,10 +117,9 @@ src/
 
 - **Zdjęcia** — sekcja „przed / po", hero i „O mnie" używają ilustracji SVG jako
   placeholderów (`src/components/DogArt.tsx`).
-- **Ceny z gwiazdką** — potwierdzone w Booksy są Shih Tzu, Maltipoo i Cocker Spaniel;
-  reszta cennika to wartości orientacyjne (`estimatedPrice: true` w `services.ts`).
-- **Opinie** — skrócone parafrazy z Booksy; docelowo pełne cytaty za zgodą autorek
-  albo widget Booksy.
-- **Tekst „O mnie"**, telefon i e-mail w stopce.
+- **Ceny z gwiazdką** — wartości orientacyjne (`estimatedPrice: true` w `services.ts`).
+- **Opinie** — fikcyjne cytaty demonstracyjne; przy wdrożeniu podmień na prawdziwe.
+- **Branding i kontakt** — wszystko w [`src/data/site.ts`](src/data/site.ts) (nazwa salonu,
+  groomerka, adres, telefon, e-mail).
 - **Godziny otwarcia** — przyjęto pon–pt 10–20, sob 10–16, niedziela nieczynne
   (`OPENING_HOURS` w `src/lib/availability.ts`).

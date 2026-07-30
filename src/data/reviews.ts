@@ -1,7 +1,6 @@
 /**
- * Opinie — skrócone, sparafrazowane wypowiedzi klientek z profilu Booksy
- * (profil: 4.8/5 z 61 opinii). Przed publikacją warto podmienić na dokładne
- * cytaty za zgodą autorek lub podpiąć widget Booksy.
+ * Opinie demonstracyjne — fikcyjne cytaty klientów.
+ * Przy wdrożeniu podmień na prawdziwe opinie lub widget zewnętrznego portalu.
  */
 export interface Review {
   id: string
@@ -12,17 +11,18 @@ export interface Review {
   date: string
 }
 
-export const BOOKSY_STATS = {
+export const REVIEW_STATS = {
   rating: 4.8,
-  count: 61,
-  fiveStars: 57,
-  url: 'https://booksy.com/pl-pl/343389_kael-pet-grooming_zwierzaki_3_warszawa',
+  count: 48,
+  fiveStars: 45,
+  url: 'https://example.com/opinie',
+  platformLabel: 'portalu opinii',
 }
 
 export const REVIEWS: Review[] = [
   {
     id: 'r1',
-    author: 'Angelina',
+    author: 'Katarzyna',
     dog: 'Shih Tzu, 6 kg',
     rating: 5,
     text: 'Piękne strzyżenie i bardzo delikatne podejście do psa. Czyste uszy, mnóstwo cierpliwości — polecam z całego serca!',
@@ -30,7 +30,7 @@ export const REVIEWS: Review[] = [
   },
   {
     id: 'r2',
-    author: 'Elizaveta',
+    author: 'Joanna',
     dog: 'Szpic miniaturowy, 4,5 kg',
     rating: 5,
     text: 'Pierwsze strzyżenie naszego psa i wyszło po prostu perfekcyjnie. Oboje zadowoleni, wracamy!',
@@ -49,7 +49,7 @@ export const REVIEWS: Review[] = [
     author: 'Beata',
     dog: 'Maltańczyk, 5,4 kg',
     rating: 5,
-    text: 'Ogromne dzięki za opiekę nad Kiki. To miejsce polecam każdemu, kto szuka spokojnego groomera.',
+    text: 'Ogromne dzięki za opiekę nad naszym maltańczykiem. To miejsce polecam każdemu, kto szuka spokojnego groomera.',
     date: 'kwiecień 2026',
   },
   {
@@ -57,7 +57,7 @@ export const REVIEWS: Review[] = [
     author: 'Karolina',
     dog: 'Maltipoo, 4 kg',
     rating: 5,
-    text: 'Luna wychodzi stąd jak z reklamy, a co ważniejsze — wchodzi bez stresu. Rewelacyjny kontakt i punktualność.',
+    text: 'Pies wychodzi stąd jak z reklamy, a co ważniejsze — wchodzi bez stresu. Rewelacyjny kontakt i punktualność.',
     date: 'kwiecień 2026',
   },
   {

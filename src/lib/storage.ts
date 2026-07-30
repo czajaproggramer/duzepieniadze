@@ -1,9 +1,9 @@
 import type { BookingDraft, DB } from './types'
 
-const KEY = 'kael-pet-grooming::db'
-const DRAFT_KEY = 'kael-pet-grooming::draft'
+const KEY = 'salon-demo::db'
+const DRAFT_KEY = 'salon-demo::draft'
 
-export const DB_VERSION = 6
+export const DB_VERSION = 7
 
 export function uid(prefix = 'id'): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}${Date.now().toString(36).slice(-3)}`

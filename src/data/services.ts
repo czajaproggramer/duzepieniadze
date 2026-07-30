@@ -2,7 +2,7 @@ import type { Service } from '../lib/types'
 
 /**
  * Cennik.
- * Pozycje bez `estimatedPrice` pochodzą z profilu Booksy Kael Pet Grooming.
+ * Pozycje bez `estimatedPrice` to przykładowe ceny salonu.
  * Pozycje z `estimatedPrice: true` to ceny ORIENTACYJNE (demo) — do potwierdzenia
  * przez salon przed publikacją strony.
  */

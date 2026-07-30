@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Icon } from '../components/Icon'
+import { SITE } from '../data/site'
 import { useStore } from '../lib/store'
 
 export function Login() {
@@ -182,13 +183,13 @@ export function Login() {
             </button>
             <button
               className="btn btn-light btn-sm"
-              onClick={() => quickLogin('admin@kaelpetgrooming.pl', 'admin1234')}
+              onClick={() => quickLogin(SITE.adminEmail, 'admin1234')}
             >
               Administrator salonu
             </button>
           </div>
           <p className="text-muted mono mt-2">
-            jan@example.com / demo1234 · admin@kaelpetgrooming.pl / admin1234
+            jan@example.com / demo1234 · {SITE.adminEmail} / admin1234
           </p>
           <p className="text-faint small mb-0">
             To demo bez serwera, hasła są trzymane jawnie w localStorage przeglądarki.

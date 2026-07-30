@@ -1,12 +1,11 @@
-# Overview — Kael Pet Grooming
+# Overview — Salon Demo
 
 Dokument techniczny opisujący, **jak działa aplikacja**. Uzupełnia [README.md](README.md)
 (który jest bardziej marketingowo-funkcjonalny). Utrzymuj ten plik na bieżąco — patrz
 instrukcja w [CLAUDE.md](CLAUDE.md).
 
-> Ostatnia istotna zmiana: przebudowa zakładki admina **Follow-upy → Przypomnienia**
-> (edytor wzorca wiadomości ze zmiennymi + wyprzedzenie + tabela psów po terminie)
-> oraz naprawa przycinania tekstu w kalendarzu dnia dla krótkich wizyt.
+> Ostatnia istotna zmiana: anonimizacja danych demo (branding, kontakty, adresy w
+> `src/data/site.ts`; klucze `localStorage` → `salon-demo::*`, `DB_VERSION = 7`).
 
 ---
 
@@ -41,7 +40,7 @@ main.tsx → <StoreProvider> → <App/>
   oraz sesję zalogowanego użytkownika i szkic rezerwacji. Wszystkie mutacje idą przez
   akcje wystawiane w `StoreValue`. Komponenty czytają przez hook `useStore()`.
 - **Persystencja** ([src/lib/storage.ts](src/lib/storage.ts)): `DB` serializowany do
-  `localStorage` pod kluczem `kael-pet-grooming::db`, sesja pod `::session`, szkic
+  `localStorage` pod kluczem `salon-demo::db`, sesja pod `::session`, szkic
   rezerwacji pod `::draft`. Zapis w `useEffect` przy każdej zmianie stanu.
 - **Seed** ([src/lib/seed.ts](src/lib/seed.ts)): dane startowe generowane względem „dziś",
   żeby kalendarz i przypomnienia zawsze wyglądały świeżo. Ustawia `version: DB_VERSION`.
@@ -53,7 +52,7 @@ i aplikacja siewa dane od nowa. **Każda zmiana kształtu `DB`/`Settings`/modeli
 wymaga podbicia `DB_VERSION` w [src/lib/storage.ts](src/lib/storage.ts).** Inaczej stare
 dane w `localStorage` nie mają nowego pola, `npm run build` przechodzi (TS nie widzi danych
 runtime), a aplikacja wywala się dopiero w przeglądarce. Po takich zmianach weryfikuj
-w przeglądarce, nie tylko buildem. (Aktualnie `DB_VERSION = 6`.)
+w przeglądarce, nie tylko buildem. (Aktualnie `DB_VERSION = 7`.)
 
 ---
 
@@ -73,7 +72,8 @@ Definicje: [src/lib/types.ts](src/lib/types.ts). Kluczowe encje w `DB`:
 | `followUpLog` | log działań automatu (pokazywany historycznie). |
 
 Rasy i usługi to **dane statyczne** (nie w `DB`): [src/data/breeds.ts](src/data/breeds.ts),
-[src/data/services.ts](src/data/services.ts), [src/data/reviews.ts](src/data/reviews.ts).
+[src/data/services.ts](src/data/services.ts), [src/data/reviews.ts](src/data/reviews.ts),
+[src/data/site.ts](src/data/site.ts) (nazwa salonu, kontakt, adres).
 
 ---
 

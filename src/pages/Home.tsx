@@ -7,7 +7,8 @@ import { HeroArt, PortraitArt } from '../components/DogArt'
 import { Avatar, FeatureIcon, Icon, IconChip, Stars, type IconName } from '../components/Icon'
 import { useToast } from '../components/Toast'
 import { BREEDS, breedById, growthLabel } from '../data/breeds'
-import { BOOKSY_STATS, REVIEWS } from '../data/reviews'
+import { REVIEW_STATS, REVIEWS } from '../data/reviews'
+import { SITE } from '../data/site'
 import { CATEGORY_LABEL, SERVICES } from '../data/services'
 import { availableSlots, nextFreeSlots, openingLabel } from '../lib/availability'
 import {
@@ -56,7 +57,7 @@ function Hero() {
     <header className="hero">
       <div className="container hero-grid">
         <div className="hero-copy">
-          <span className="eyebrow">Warszawa · Bemowo</span>
+          <span className="eyebrow">{SITE.locationEyebrow}</span>
           <h1>
             Salon, z którego Twój pies wychodzi{' '}
             <span className="accent">zadbany i spokojny</span>
@@ -168,7 +169,8 @@ function About() {
         <div>
           <span className="eyebrow">O mnie</span>
           <h2>
-            Oksana, groomerka <span className="accent">z Bemowa</span>
+            {SITE.groomerFirstName}, groomerka{' '}
+            <span className="accent">{SITE.aboutLocation}</span>
           </h2>
           <p className="text-muted">
             Od kilku lat zajmuję się pielęgnacją psów małych i średnich ras. Prowadzę
@@ -185,8 +187,8 @@ function About() {
 
           <div className="fact-row">
             <div className="fact">
-              <b>{BOOKSY_STATS.rating}/5</b>
-              <span>średnia z {BOOKSY_STATS.count} opinii</span>
+              <b>{REVIEW_STATS.rating}/5</b>
+              <span>średnia z {REVIEW_STATS.count} opinii</span>
             </div>
             <div className="fact">
               <b>1:1</b>
@@ -359,7 +361,7 @@ function WhyUs() {
       <div className="container">
         <div className="section-head">
           <h2>
-            Dlaczego <span className="accent">Kael</span>
+            Dlaczego <span className="accent">{SITE.brandLine2}</span>
           </h2>
           <p>Cztery rzeczy, które robimy inaczej niż duże salony.</p>
         </div>
@@ -440,8 +442,8 @@ function Pricing() {
         ))}
 
         <p className="footnote">
-          * Ceny oznaczone gwiazdką są orientacyjne (dane demonstracyjne). Potwierdzone
-          w cenniku Booksy są pozycje dla Shih Tzu, Maltipoo i Cocker Spaniela.
+          * Ceny oznaczone gwiazdką są orientacyjne (dane demonstracyjne). Pozostałe
+          pozycje to przykładowy cennik salonu.
         </p>
       </div>
     </section>
@@ -463,20 +465,20 @@ function Reviews() {
         </div>
 
         <div className="rating-summary">
-          <div className="score">{BOOKSY_STATS.rating}</div>
+          <div className="score">{REVIEW_STATS.rating}</div>
           <div>
             <Stars />
             <div className="text-muted small">
-              {BOOKSY_STATS.count} opinii, w tym {BOOKSY_STATS.fiveStars} na pięć gwiazdek
+              {REVIEW_STATS.count} opinii, w tym {REVIEW_STATS.fiveStars} na pięć gwiazdek
             </div>
           </div>
           <a
-            href={BOOKSY_STATS.url}
+            href={REVIEW_STATS.url}
             target="_blank"
             rel="noreferrer"
             className="btn btn-outline btn-sm"
           >
-            Zobacz na Booksy
+            Zobacz więcej opinii
             <Icon name="external" size={14} />
           </a>
         </div>
@@ -500,8 +502,8 @@ function Reviews() {
         </div>
 
         <p className="footnote mt-3">
-          Opinie w skróconej formie na podstawie profilu Booksy. Przed publikacją warto
-          podmienić je na pełne cytaty lub osadzić widget Booksy.
+          Opinie demonstracyjne — fikcyjne cytaty klientów. Przy wdrożeniu podmień je na
+          prawdziwe opinie lub osadź widget zewnętrznego portalu.
         </p>
       </div>
     </section>
@@ -780,17 +782,17 @@ function Contact() {
             <div className="flex flex-start" style={{ marginBottom: 18 }}>
               <IconChip name="pin" />
               <div>
-                <div>ul. Siodlarska 12, lokal 2</div>
-                <div className="text-muted small">01-461 Warszawa, Bemowo</div>
+                <div>{SITE.addressLine1}</div>
+                <div className="text-muted small">{SITE.addressLine2}</div>
               </div>
             </div>
             <div className="flex flex-start" style={{ marginBottom: 24 }}>
               <IconChip name="phone" />
               <div>
-                <a href="tel:+48500100200" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  +48 500 100 200
+                <a href={`tel:${SITE.phoneTel}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {SITE.phone}
                 </a>
-                <div className="text-muted small">kontakt@kaelpetgrooming.pl</div>
+                <div className="text-muted small">{SITE.email}</div>
               </div>
             </div>
 
@@ -824,12 +826,12 @@ function Contact() {
             </div>
 
             <a
-              href={BOOKSY_STATS.url}
+              href={REVIEW_STATS.url}
               target="_blank"
               rel="noreferrer"
               className="btn btn-outline btn-block"
             >
-              Profil na Booksy
+              Więcej opinii online
               <Icon name="external" size={14} />
             </a>
           </div>

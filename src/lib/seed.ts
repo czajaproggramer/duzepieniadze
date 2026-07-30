@@ -14,9 +14,9 @@ export function seedDB(): DB {
   const users: User[] = [
     {
       id: 'u_admin',
-      name: 'Oksana Kalinchuk',
-      email: 'admin@kaelpetgrooming.pl',
-      phone: '+48 500 100 200',
+      name: 'Anna Kowalska',
+      email: 'admin@example.com',
+      phone: '+48 123 456 789',
       password: 'admin1234',
       role: 'admin',
       createdAt: stamp,

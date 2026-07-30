@@ -4,8 +4,8 @@ Dokument techniczny opisujący, **jak działa aplikacja**. Uzupełnia [README.md
 (który jest bardziej marketingowo-funkcjonalny). Utrzymuj ten plik na bieżąco — patrz
 instrukcja w [CLAUDE.md](CLAUDE.md).
 
-> Ostatnia istotna zmiana: design system → **pudrowy róż** (blush + Manrope;
-> tokeny w `styles.css`, ilustracje `DogArt`, favicon).
+> Ostatnia istotna zmiana: w zakładce admina „Przypomnienia" dodano listę „Ostatnio
+> wysłane przypomnienia" z paginacją po 5 (patrz §7).
 
 ---
 
@@ -148,6 +148,11 @@ Komponent `Reminders` w [src/pages/Admin.tsx](src/pages/Admin.tsx). Zawiera:
   0/3/7/14 dni), przycisk „Zapisz wzorzec" i **podgląd na żywo** na przykładowym psie.
 - **Tabela „Psy po terminie"** — tylko psy w stanie `po-terminie` bez umówionej wizyty,
   z wyrenderowaną treścią przypomnienia dla każdego.
+- **Lista „Ostatnio wysłane przypomnienia"** — wysłane follow-upy (`status === 'sent'`)
+  posortowane malejąco po `sentAt`, z **paginacją po `SENT_PER_PAGE = 5`** na stronę
+  (stan `sentPage`, `currentSentPage` klamrowany do zakresu; pager `.reminder-pager`
+  chowa się przy jednej stronie). Każda karta: awatar psa, właściciel, `formatStamp(sentAt)`,
+  `automat`/`ręcznie`, treść i plakietka „dostarczone".
 
 Wzorzec zapisuje się przez `setReminderTemplate` (na blur i przyciskiem). Lokalny stan
 `template` ma fallback `?? ''`, a `renderReminderTemplate` zabezpiecza `undefined`.

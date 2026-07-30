@@ -758,9 +758,12 @@ const SAMPLE_SCHEDULE: PetSchedule = {
   state: 'po-terminie',
 }
 
+const SENT_PER_PAGE = 5
+
 function Reminders() {
   const { db, setLeadDays, setReminderTemplate } = useStore()
   const [template, setTemplate] = useState(db.settings.reminderTemplate ?? '')
+  const [sentPage, setSentPage] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -773,6 +776,24 @@ function Reminders() {
   )
 
   const sample = overdue[0] ?? schedules[0]
+
+  const petName = (id: string) => db.pets.find((p) => p.id === id)?.name ?? '—'
+  const ownerName = (id: string) => db.users.find((u) => u.id === id)?.name ?? '—'
+
+  // Ostatnio wysłane przypomnienia — najnowsze na górze.
+  const sent = useMemo(
+    () =>
+      db.followUps
+        .filter((f) => f.status === 'sent')
+        .sort((a, b) => (b.sentAt ?? '').localeCompare(a.sentAt ?? '')),
+    [db.followUps],
+  )
+  const sentPages = Math.max(1, Math.ceil(sent.length / SENT_PER_PAGE))
+  const currentSentPage = Math.min(sentPage, sentPages - 1)
+  const sentSlice = sent.slice(
+    currentSentPage * SENT_PER_PAGE,
+    currentSentPage * SENT_PER_PAGE + SENT_PER_PAGE,
+  )
 
   const insertVariable = (token: string) => {
     const el = textareaRef.current
@@ -902,6 +923,57 @@ function Reminders() {
             </tbody>
           </table>
         </div>
+      )}
+
+      <h3 className="mt-3">Ostatnio wysłane przypomnienia ({sent.length})</h3>
+      {sent.length === 0 ? (
+        <div className="empty">
+          <IconChip name="send" />
+          Nie wysłano jeszcze żadnego przypomnienia.
+        </div>
+      ) : (
+        <>
+          <div className="list">
+            {sentSlice.map((f) => (
+              <article key={f.id} className="row-card">
+                <Avatar label={petName(f.petId)} />
+                <div className="grow">
+                  <h4>{petName(f.petId)}</h4>
+                  <div className="sub">
+                    {ownerName(f.clientId)} · {f.sentAt ? formatStamp(f.sentAt) : '—'} ·{' '}
+                    {f.auto ? 'automat' : 'ręcznie'}
+                  </div>
+                  <div className="quote-box mt-1">{f.text}</div>
+                </div>
+                <span className="badge badge-mint">dostarczone</span>
+              </article>
+            ))}
+          </div>
+
+          {sentPages > 1 && (
+            <div className="reminder-pager">
+              <button
+                className="btn btn-outline btn-sm"
+                disabled={currentSentPage === 0}
+                onClick={() => setSentPage(currentSentPage - 1)}
+              >
+                <Icon name="chevronLeft" size={14} />
+                Poprzednia
+              </button>
+              <span className="text-muted small">
+                Strona {currentSentPage + 1} z {sentPages}
+              </span>
+              <button
+                className="btn btn-outline btn-sm"
+                disabled={currentSentPage >= sentPages - 1}
+                onClick={() => setSentPage(currentSentPage + 1)}
+              >
+                Następna
+                <Icon name="chevronRight" size={14} />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </>
   )

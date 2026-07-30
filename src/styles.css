@@ -2387,3 +2387,11 @@ tbody tr:last-child td {
   gap: 8px;
   margin-top: 10px;
 }
+
+.reminder-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}

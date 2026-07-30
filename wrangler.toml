@@ -1,0 +1,6 @@
+# Konfiguracja Cloudflare Pages.
+# `pages_build_output_dir` sprawia, że Wrangler traktuje projekt jako Pages
+# i deployuje zawartość katalogu z buildem (npm run build → dist).
+name = "kael-pet-grooming"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "dist"

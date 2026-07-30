@@ -8,12 +8,13 @@ React + TypeScript + Vite. **Zero backendu** — dane żyją w `localStorage` pr
 
 ## Design system
 
-- **Kolory:** terakota `#e5814f` jako tło strony i akcent, krem `#fbede0`, biel kart,
-  czerń `#1b1a19` na przyciskach i blokach CTA. Semantyka: mięta, masło, róż.
-  Wszystkie tokeny są na górze [`src/styles.css`](src/styles.css).
-- **Typografia:** Playfair Display (nagłówki, akcenty kursywą w kolorze terakoty),
-  Inter (treść), Caveat (odręczne adnotacje przy CTA).
-- **Układ:** cała strona żyje w białej, zaokrąglonej ramce (`.shell`) na pomarańczowym
+- **Kolory:** pudrowy róż `#d98996` jako akcent i rama strony (`#e8b8be`), kremowo-różowa
+  biel `#fffafb` / `#f8e6e9`, soft charcoal `#2c2628` na przyciskach i blokach CTA.
+  Semantyka: mięta, champagne blush, róż. Wszystkie tokeny są na górze
+  [`src/styles.css`](src/styles.css).
+- **Typografia:** Playfair Display (nagłówki, akcenty kursywą w kolorze blush),
+  Manrope (treść), Caveat (odręczne adnotacje przy CTA).
+- **Układ:** cała strona żyje w białej, zaokrąglonej ramce (`.shell`) na pudrowym
   tle. Sekcje akcentowe i ciemne to bloki `.block--accent` / `.block--dark`
   z delikatnym wzorem łapek w tle.
 - **Ikony:** własny zestaw konturowych SVG w [`src/components/Icon.tsx`](src/components/Icon.tsx).

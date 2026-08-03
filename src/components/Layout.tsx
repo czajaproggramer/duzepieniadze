@@ -1,13 +1,28 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { REVIEW_STATS } from '../data/reviews'
 import { SITE } from '../data/site'
-import { useStore } from '../lib/store'
+import { LANDING_THEMES, useStore } from '../lib/store'
 import { Icon } from './Icon'
+import { IconS } from './IconStonowany'
 
+/**
+ * Motyw obowiązuje wyłącznie na landingu (`/`). Panel klienta i panel admina
+ * zawsze renderują się w bazowej oprawie — stąd `isLanding` w klasach.
+ */
 export function Layout({ children }: { children: ReactNode }) {
+  const { theme } = useStore()
+  const location = useLocation()
+  const stonowany = location.pathname === '/' && theme === 'stonowany'
+
+  // Tło poza `.shell` maluje `body`, więc klasa musi wylądować też tam.
+  useEffect(() => {
+    document.body.classList.toggle('motyw-stonowany', stonowany)
+    return () => document.body.classList.remove('motyw-stonowany')
+  }, [stonowany])
+
   return (
-    <div className="shell">
+    <div className={`shell ${stonowany ? 'theme-stonowany' : ''}`}>
       <DemoBar />
       <Nav />
       <main>{children}</main>
@@ -57,9 +72,7 @@ function Nav() {
     <nav className="nav">
       <div className={`container nav-inner ${open ? 'nav-menu-open' : ''}`}>
         <Link to="/" className="logo" onClick={close}>
-          <span className="logo-mark">
-            <Icon name="paw" size={30} strokeWidth={1.3} />
-          </span>
+          <BrandMark />
           <span className="logo-word">
             <span>{SITE.brandLine1}</span>
             <span>{SITE.brandLine2}</span>
@@ -93,6 +106,7 @@ function Nav() {
             <button className="linklike" onClick={() => goSection('#efekty')}>
               Efekty
             </button>
+            <ThemeMenu onPick={close} />
           </div>
         )}
 
@@ -132,6 +146,82 @@ function Nav() {
         </div>
       </div>
     </nav>
+  )
+}
+
+/** Znak firmowy w logo. Motyw „Stonowany" ma własny, pełny rysunek łapy. */
+function BrandMark() {
+  const { theme } = useStore()
+  const location = useLocation()
+  const stonowany = location.pathname === '/' && theme === 'stonowany'
+
+  return (
+    <span className="logo-mark">
+      {stonowany ? <IconS name="paw" size={19} /> : <Icon name="paw" size={30} strokeWidth={1.3} />}
+    </span>
+  )
+}
+
+/** Przełącznik oprawy landingu — widoczny tylko na stronie głównej. */
+function ThemeMenu({ onPick }: { onPick: () => void }) {
+  const { theme, setTheme } = useStore()
+  const [open, setOpen] = useState(false)
+  const wrap = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent) => {
+      if (!wrap.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const current = LANDING_THEMES.find((t) => t.id === theme)
+
+  return (
+    <div className={`theme-menu ${open ? 'is-open' : ''}`} ref={wrap}>
+      <button
+        className="linklike theme-menu-trigger"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+      >
+        Motywy
+        <Icon name="chevronRight" size={14} />
+      </button>
+
+      {open && (
+        <div className="theme-menu-pop" role="menu">
+          {LANDING_THEMES.map((t) => (
+            <button
+              key={t.id}
+              role="menuitemradio"
+              aria-checked={t.id === theme}
+              className={`theme-option ${t.id === theme ? 'is-active' : ''}`}
+              onClick={() => {
+                setTheme(t.id)
+                setOpen(false)
+                onPick()
+              }}
+            >
+              <span className="theme-option-text">
+                <b>{t.label}</b>
+                <small>{t.hint}</small>
+              </span>
+              {t.id === theme && <Icon name="check" size={15} />}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <span className="sr-only">Aktualny motyw: {current?.label}</span>
+    </div>
   )
 }
 

@@ -4,9 +4,10 @@ import { BeforeAfter } from '../components/BeforeAfter'
 import { Calendar } from '../components/Calendar'
 import { HandNote } from '../components/Decor'
 import { HeroArt, PortraitArt } from '../components/DogArt'
-import { Avatar, FeatureIcon, Icon, IconChip, Stars, type IconName } from '../components/Icon'
+import { Avatar, FeatureIcon, Icon, IconChip, Stars } from '../components/Icon'
 import { useToast } from '../components/Toast'
 import { BREEDS, breedById, growthLabel } from '../data/breeds'
+import { CATEGORY_ICON, INCLUDED, WHY } from '../data/landing'
 import { REVIEW_STATS, REVIEWS } from '../data/reviews'
 import { SITE } from '../data/site'
 import { CATEGORY_LABEL, SERVICES } from '../data/services'
@@ -20,9 +21,16 @@ import {
   todayISO,
 } from '../lib/date'
 import { useStore } from '../lib/store'
+import { HomeStonowany } from './HomeStonowany'
 
+/**
+ * Landing w dwóch oprawach. Wybór motywu („Motywy" w nawigacji) trzyma store;
+ * treść jest identyczna w obu wariantach — różni się układ, ikony i materiał
+ * wizualny. Motyw nie dotyka panelu klienta ani admina.
+ */
 export function Home() {
   const location = useLocation()
+  const { theme } = useStore()
 
   useEffect(() => {
     if (location.hash) {
@@ -31,8 +39,12 @@ export function Home() {
     } else {
       window.scrollTo(0, 0)
     }
-  }, [location.hash])
+  }, [location.hash, theme])
 
+  return theme === 'stonowany' ? <HomeStonowany /> : <HomeCukierkowy />
+}
+
+function HomeCukierkowy() {
   return (
     <>
       <Hero />
@@ -100,34 +112,6 @@ function Hero() {
 }
 
 /* ─────────────────────── CO OBEJMUJE WIZYTA ─────────────────────── */
-
-const INCLUDED: { icon: IconName; title: string; text: string }[] = [
-  {
-    icon: 'droplet',
-    title: 'Kąpiel i suszenie',
-    text: 'Kosmetyki dobrane do typu okrywy i skóry. Suszenie ręczne, bez klatki i bez pośpiechu.',
-  },
-  {
-    icon: 'scissors',
-    title: 'Strzyżenie nożyczkowe',
-    text: 'Fryzura dobrana do rasy, typu włosa i trybu życia psa. Wzorcowa albo praktyczna, krótsza.',
-  },
-  {
-    icon: 'paw',
-    title: 'Pazurki i uszy',
-    text: 'Skracanie pazurów, czyszczenie kanałów usznych i okolic oczu. W cenie każdej wizyty.',
-  },
-  {
-    icon: 'brush',
-    title: 'Rozczesywanie',
-    text: 'Cierpliwe rozczesywanie kołtunów tam, gdzie da się je uratować bez krzywdzenia psa.',
-  },
-  {
-    icon: 'note',
-    title: 'Karta pupila',
-    text: 'Rasa, waga, uwagi i historia wizyt zapisane w koncie. Nie musisz powtarzać ich za każdym razem.',
-  },
-]
 
 function Included() {
   return (
@@ -332,29 +316,6 @@ function IntervalCalculator() {
 
 /* ─────────────────────────── DLACZEGO ─────────────────────────── */
 
-const WHY: { icon: IconName; title: string; text: string }[] = [
-  {
-    icon: 'clock',
-    title: 'Bez pośpiechu',
-    text: 'Jeden pies w salonie naraz i realny czas na przerwy.',
-  },
-  {
-    icon: 'scissors',
-    title: 'Fryzura pod okrywę',
-    text: 'Dobrana do typu włosa, a nie do szablonu z internetu.',
-  },
-  {
-    icon: 'calendar',
-    title: 'Rezerwacja online',
-    text: 'Wolne godziny widoczne od razu, bez telefonów i czekania.',
-  },
-  {
-    icon: 'bell',
-    title: 'Przypomnienia',
-    text: 'System sam policzy, kiedy futro odrośnie, i da znać.',
-  },
-]
-
 function WhyUs() {
   return (
     <section className="section section--cream paws paws--ink">
@@ -381,12 +342,6 @@ function WhyUs() {
 }
 
 /* ─────────────────────────── CENNIK ─────────────────────────── */
-
-const CATEGORY_ICON: Record<string, IconName> = {
-  strzyzenie: 'scissors',
-  kapiel: 'droplet',
-  dodatki: 'paw',
-}
 
 function Pricing() {
   const categories = ['strzyzenie', 'kapiel', 'dodatki'] as const

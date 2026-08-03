@@ -4,8 +4,9 @@ Dokument techniczny opisujący, **jak działa aplikacja**. Uzupełnia [README.md
 (który jest bardziej marketingowo-funkcjonalny). Utrzymuj ten plik na bieżąco — patrz
 instrukcja w [CLAUDE.md](CLAUDE.md).
 
-> Ostatnia istotna zmiana: w zakładce admina „Przypomnienia" dodano listę „Ostatnio
-> wysłane przypomnienia" z paginacją po 5 (patrz §7).
+> Ostatnia istotna zmiana: landing ma **dwa motywy** — „Cukierkowy" (dotychczasowy)
+> i „Stonowany" (nowy układ, fotografie, drugi zestaw ikon), przełączane z nawigacji
+> rozwijanym menu „Motywy" (patrz §4a).
 
 ---
 
@@ -85,13 +86,51 @@ nawigacja (linki do sekcji landingu + panel/konto zależnie od roli), stopka.
 
 | Ścieżka | Strona | Rola |
 | --- | --- | --- |
-| `/` | [Home](src/pages/Home.tsx) — landing (hero, cechy, kalkulator odstępu, cennik, opinie, przed/po, kalendarz dostępności, CTA, kontakt) | publiczna |
+| `/` | [Home](src/pages/Home.tsx) — landing (hero, cechy, kalkulator odstępu, cennik, opinie, przed/po, kalendarz dostępności, CTA, kontakt) w jednym z dwóch motywów, patrz §4a | publiczna |
 | `/rezerwacja` | [Booking](src/pages/Booking.tsx) — kreator 4-krokowy: pupil → usługa → termin → potwierdzenie | publiczna (wymaga konta do finalizacji) |
 | `/logowanie` | [Login](src/pages/Login.tsx) — logowanie/rejestracja, przyciski kont demo | publiczna |
 | `/konto` | [Account](src/pages/Account.tsx) — wizyty, profile pupili, skrzynka przypomnień, dane | klient |
 | `/admin` | [Admin](src/pages/Admin.tsx) — przegląd, klienci, wizyty, wiadomości, przypomnienia | admin |
 
 Brak twardego guardu tras — strony renderują treść zależnie od `user`/`isAdmin` ze store.
+
+---
+
+## 4a. Motywy landingu
+
+Landing renderuje się w jednej z **dwóch opraw**. Wybór trzyma store (`theme`,
+`setTheme`, typ `LandingTheme` w [store.tsx](src/lib/store.tsx)), persystencja pod
+`localStorage['salon-demo::motyw']` — **poza `DB`**, więc „Zresetuj dane" jej nie kasuje
+i zmiana nie wymaga podbicia `DB_VERSION`. Lista wariantów: `LANDING_THEMES`.
+
+| Motyw | Plik | Charakterystyka |
+| --- | --- | --- |
+| `cukierkowy` (domyślny) | `HomeCukierkowy` w [Home.tsx](src/pages/Home.tsx) | pudrowy róż, serif w nagłówkach, ilustracje SVG (`DogArt`), ikony konturowe (`Icon.tsx`), karty i pigułki |
+| `stonowany` | [HomeStonowany.tsx](src/pages/HomeStonowany.tsx) | szałwia + kamień, grotesk w nagłówkach (serif italic tylko jako akcent), **fotografie**, ikony pełne (`IconStonowany.tsx`), układ edytorski: hero split, kolumna zdjęcia przy usługach, nachodzący panel „O mnie", ciemna sekcja kalkulatora, cennik jako lista wierszy, pas zdjęć |
+
+**Zasady:**
+- **Treść jest 1:1 w obu motywach.** Motyw zmienia wyłącznie układ, typografię, ikony
+  i materiał wizualny — nigdy copy. Teksty powtarzalne (lista „co obejmuje wizyta",
+  „dlaczego my", ikony kategorii cennika) siedzą w [src/data/landing.ts](src/data/landing.ts),
+  żeby warianty nie mogły się rozjechać. Resztę trzymaj zgodną ręcznie.
+- **Motyw dotyczy tylko `/`.** [Layout](src/components/Layout.tsx) nakłada klasy
+  `theme-stonowany` (na `.shell`) i `motyw-stonowany` (na `body` — maluje tło poza
+  kontenerem) wyłącznie gdy `pathname === '/'`. Panel klienta, panel admina i rezerwacja
+  zawsze wyglądają tak samo.
+- **Przełącznik:** komponent `ThemeMenu` w `Layout.tsx` — rozwijane menu „Motywy"
+  w nawigacji, obok kotwic sekcji (czyli też tylko na landingu).
+- **Style:** osobny arkusz [src/styles-stonowany.css](src/styles-stonowany.css),
+  wszystko pod `.theme-stonowany` / `.st`. Klasy landingu mają prefiks `st-`.
+
+### Zdjęcia motywu „Stonowany"
+
+Sloty zdjęć: [src/data/photos.ts](src/data/photos.ts); pliki wrzuca się do
+`public/photos/`. Komponent [Photo.tsx](src/components/Photo.tsx) przy braku pliku
+(`onError`) pokazuje neutralny kadr-placeholder, więc układ nie sypie się bez zdjęć.
+Prompty do wygenerowania każdego ujęcia (Nano Banana) leżą w
+[public/photos/PROMPTY.md](public/photos/PROMPTY.md) — nazwy plików muszą się zgadzać
+z `photos.ts`. `BeforeAfter` przyjmuje `media="zdjecie"` i wtedy zamiast `DogArt`
+renderuje pary zdjęć z `BEFORE_AFTER_PHOTOS`.
 
 ---
 
@@ -172,15 +211,22 @@ CSS bloków: reguły `.daycal-*` w [src/styles.css](src/styles.css).
 
 - [src/components/Icon.tsx](src/components/Icon.tsx) — własny zestaw konturowych SVG.
   **W UI nie ma emoji** (poza treścią wzorca wiadomości); awatary = inicjały, statusy = plakietki.
+- [src/components/IconStonowany.tsx](src/components/IconStonowany.tsx) — drugi zestaw ikon
+  (pełne sylwetki, wycięcia przez `fill-rule: evenodd`) dla motywu „Stonowany". Te same
+  klucze `IconName`; brakujące nazwy spadają na wersję konturową.
+- [src/components/Photo.tsx](src/components/Photo.tsx) — zdjęcie z placeholderem (motyw
+  „Stonowany", patrz §4a).
 - [src/components/Calendar.tsx](src/components/Calendar.tsx) — miesięczny picker w rezerwacji
   (nie mylić z `DaySchedule` w Admin, to osobny widok osi dnia).
 - [src/components/BeforeAfter.tsx](src/components/BeforeAfter.tsx) — suwak przed/po.
 - [src/components/DogArt.tsx](src/components/DogArt.tsx) — ilustracje SVG (placeholdery zdjęć).
 - [src/components/PetForm.tsx](src/components/PetForm.tsx) — formularz pupila.
 - [src/components/Toast.tsx](src/components/Toast.tsx) — hook `useToast()` + komponent.
-- **Style:** jeden plik [src/styles.css](src/styles.css), tokeny kolorów/typografii na górze.
+- **Style:** [src/styles.css](src/styles.css) — baza, tokeny kolorów/typografii na górze.
   Pudrowy róż `#d98996` (akcent + rama `#e8b8be`), kremowo-różowa biel, soft charcoal CTA.
-  Playfair Display / Manrope / Caveat.
+  Playfair Display / Manrope / Caveat. Drugi arkusz,
+  [src/styles-stonowany.css](src/styles-stonowany.css), dokłada motyw „Stonowany"
+  (szałwia `#7d9068`, kamień, ciemne pasy) — wyłącznie pod `.theme-stonowany` / `.st`.
 
 ---
 

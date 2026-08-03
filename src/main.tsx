@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { App } from './App'
 import { StoreProvider } from './lib/store'
 import './styles.css'
+import './styles-stonowany.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

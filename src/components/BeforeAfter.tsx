@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
+import { BEFORE_AFTER_PHOTOS } from '../data/photos'
 import { DogArt, PALETTES } from './DogArt'
 import { Icon } from './Icon'
+import { Photo } from './Photo'
 
 interface Case {
   id: string
@@ -46,7 +48,11 @@ const CASES: Case[] = [
   },
 ]
 
-export function BeforeAfter() {
+/**
+ * `media` decyduje, czym są warstwy suwaka: ilustracjami SVG (motyw
+ * „Cukierkowy") czy zdjęciami z `public/photos/` (motyw „Stonowany").
+ */
+export function BeforeAfter({ media = 'ilustracja' }: { media?: 'ilustracja' | 'zdjecie' }) {
   const [active, setActive] = useState(0)
   const [split, setSplit] = useState(50)
   const frameRef = useRef<HTMLDivElement>(null)
@@ -78,10 +84,18 @@ export function BeforeAfter() {
         style={{ ['--split' as string]: `${split}%` }}
       >
         <div className="ba-layer">
-          <DogArt groomed={false} palette={current.palette} style={current.style} />
+          {media === 'zdjecie' ? (
+            <Photo photo={BEFORE_AFTER_PHOTOS[current.id].before} fill />
+          ) : (
+            <DogArt groomed={false} palette={current.palette} style={current.style} />
+          )}
         </div>
         <div className="ba-layer ba-after">
-          <DogArt groomed palette={current.palette} style={current.style} />
+          {media === 'zdjecie' ? (
+            <Photo photo={BEFORE_AFTER_PHOTOS[current.id].after} fill />
+          ) : (
+            <DogArt groomed palette={current.palette} style={current.style} />
+          )}
         </div>
         <span className="ba-tag left">przed</span>
         <span className="ba-tag right">po</span>

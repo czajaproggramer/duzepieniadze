@@ -16,6 +16,15 @@ import { seedDB } from './seed'
 import type { Appointment, BookingDraft, DB, Message, Pet, User } from './types'
 
 const SESSION_KEY = 'salon-demo::session'
+const THEME_KEY = 'salon-demo::motyw'
+
+/** Wariant oprawy landingu. Nie dotyczy panelu klienta ani admina. */
+export type LandingTheme = 'cukierkowy' | 'stonowany'
+
+export const LANDING_THEMES: { id: LandingTheme; label: string; hint: string }[] = [
+  { id: 'cukierkowy', label: 'Cukierkowy', hint: 'pudrowy róż, ilustracje, serif' },
+  { id: 'stonowany', label: 'Stonowany', hint: 'szałwia, fotografie, grotesk' },
+]
 
 interface StoreValue {
   db: DB
@@ -67,6 +76,9 @@ interface StoreValue {
   startDraft: (init: BookingDraft) => void
   patchDraft: (patch: Partial<BookingDraft>) => void
   clearDraft: () => void
+  // oprawa landingu
+  theme: LandingTheme
+  setTheme: (theme: LandingTheme) => void
   // demo
   resetDemo: () => void
 }
@@ -79,10 +91,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     localStorage.getItem(SESSION_KEY),
   )
   const [draft, setDraft] = useState<BookingDraft | null>(() => loadDraft())
+  const [theme, setTheme] = useState<LandingTheme>(() =>
+    localStorage.getItem(THEME_KEY) === 'stonowany' ? 'stonowany' : 'cukierkowy',
+  )
   const bootRan = useRef(false)
 
   useEffect(() => saveDB(db), [db])
   useEffect(() => saveDraft(draft), [draft])
+
+  // Wybór motywu to preferencja widoku, nie dane demo — trzymamy go poza `DB`,
+  // dzięki czemu „Zresetuj dane" go nie kasuje i nie wymaga podbicia DB_VERSION.
+  useEffect(() => {
+    try {
+      localStorage.setItem(THEME_KEY, theme)
+    } catch (err) {
+      console.warn('Nie udało się zapisać wyboru motywu', err)
+    }
+  }, [theme])
 
   useEffect(() => {
     if (userId) localStorage.setItem(SESSION_KEY, userId)
@@ -382,6 +407,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     clearDraft() {
       setDraft(null)
     },
+
+    theme,
+    setTheme,
 
     resetDemo() {
       clearDB()

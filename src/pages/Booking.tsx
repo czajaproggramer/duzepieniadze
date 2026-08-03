@@ -301,7 +301,7 @@ function PetStep({
                 className={`choice ${p.id === selectedId ? 'selected' : ''}`}
                 onClick={() => onPick(p.id)}
               >
-                <Avatar label={p.name} />
+                <Avatar label={p.name} photoUrl={p.photoUrl} />
                 <span className="grow">
                   <b>{p.name}</b>
                   <span className="meta">

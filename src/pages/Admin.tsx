@@ -469,7 +469,7 @@ function ClientCard({
           <div className="grid grid-2">
             {schedules.map((s) => (
               <div key={s.pet.id} className="row-card">
-                <Avatar label={s.pet.name} />
+                <Avatar label={s.pet.name} photoUrl={s.pet.photoUrl} />
                 <div className="grow">
                   <h4>
                     {s.pet.name}
@@ -852,6 +852,7 @@ function Reminders() {
   const sample = overdue[0] ?? schedules[0]
 
   const petName = (id: string) => db.pets.find((p) => p.id === id)?.name ?? '—'
+  const petPhoto = (id: string) => db.pets.find((p) => p.id === id)?.photoUrl
   const ownerName = (id: string) => db.users.find((u) => u.id === id)?.name ?? '—'
 
   // Ostatnio wysłane przypomnienia — najnowsze na górze.
@@ -1062,7 +1063,7 @@ function Reminders() {
           <div className="list">
             {sentSlice.map((f) => (
               <article key={f.id} className="row-card">
-                <Avatar label={petName(f.petId)} />
+                <Avatar label={petName(f.petId)} photoUrl={petPhoto(f.petId)} />
                 <div className="grow">
                   <h4>{petName(f.petId)}</h4>
                   <div className="sub">

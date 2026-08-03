@@ -51,6 +51,9 @@ export interface Pet {
   notes?: string
   /** Data ostatniego strzyżenia sprzed startu demo (gdy brak wizyty w systemie). */
   lastGroomingDate?: string
+  /** Zdjęcie pupila (ścieżka w `public/`). Gdy ustawione, awatar pokazuje foto
+   *  zamiast inicjału imienia; przy błędzie ładowania wraca do inicjału. */
+  photoUrl?: string
 }
 
 /** Dane wpisywane w formularzu profilu pupila. */

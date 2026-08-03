@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 /**
  * Zestaw ikon liniowych. Jeden styl dla całego serwisu: kontur 1.5,
@@ -297,8 +297,24 @@ export function FeatureIcon({ name }: { name: IconName }) {
 }
 
 /** Inicjał pupila lub klienta zamiast obrazka awatara. */
-export function Avatar({ label }: { label: string }) {
-  return <span className="avatar">{label.trim().charAt(0).toUpperCase()}</span>
+/**
+ * Awatar: inicjał imienia, a gdy podano `photoUrl` — zdjęcie (np. pupila).
+ * Przy błędzie ładowania zdjęcia wracamy do inicjału, żeby układ nie sypał się
+ * bez pliku.
+ */
+export function Avatar({ label, photoUrl }: { label: string; photoUrl?: string }) {
+  const [failed, setFailed] = useState(false)
+  const initial = label.trim().charAt(0).toUpperCase()
+
+  if (photoUrl && !failed) {
+    return (
+      <span className="avatar avatar-photo">
+        <img src={photoUrl} alt={label} loading="lazy" onError={() => setFailed(true)} />
+      </span>
+    )
+  }
+
+  return <span className="avatar">{initial}</span>
 }
 
 export function Stars({ count = 5, size = 14 }: { count?: number; size?: number }) {

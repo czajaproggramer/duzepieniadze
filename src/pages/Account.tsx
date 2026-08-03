@@ -366,7 +366,7 @@ function AppointmentRow({
 
   return (
     <article className="row-card">
-      <Avatar label={pet?.name ?? 'P'} />
+      <Avatar label={pet?.name ?? 'P'} photoUrl={pet?.photoUrl} />
       <div className="grow">
         <h4>
           {pet?.name ?? 'Pupil'} · {service?.name ?? 'Usługa'}
@@ -415,7 +415,7 @@ function PetCard({
   return (
     <article className="card">
       <div className="flex flex-start">
-        <Avatar label={pet.name} />
+        <Avatar label={pet.name} photoUrl={pet.photoUrl} />
         <div className="grow">
           <h3 style={{ margin: 0 }}>{pet.name}</h3>
           <p className="text-muted small mb-0">

@@ -69,6 +69,7 @@ export function seedDB(): DB {
       birthYear: 2021,
       notes: 'Nie lubi suszarki przy uszach — prosimy o spokojne tempo.',
       lastGroomingDate: addDays(today, -47), // 6 tyg. minęło → follow-up po terminie
+      photoUrl: '/photos/pies-1.jpg',
     },
     {
       id: 'p_bruno',
@@ -79,6 +80,7 @@ export function seedDB(): DB {
       birthYear: 2019,
       notes: 'Skłonność do zapalenia uszu, proszę o dokładne osuszenie.',
       lastGroomingDate: addDays(today, -30),
+      photoUrl: '/photos/pies-2.jpg',
     },
     {
       id: 'p_luna',

@@ -56,7 +56,7 @@ i aplikacja siewa dane od nowa. **Każda zmiana kształtu `DB`/`Settings`/modeli
 wymaga podbicia `DB_VERSION` w [src/lib/storage.ts](src/lib/storage.ts).** Inaczej stare
 dane w `localStorage` nie mają nowego pola, `npm run build` przechodzi (TS nie widzi danych
 runtime), a aplikacja wywala się dopiero w przeglądarce. Po takich zmianach weryfikuj
-w przeglądarce, nie tylko buildem. (Aktualnie `DB_VERSION = 7`.)
+w przeglądarce, nie tylko buildem. (Aktualnie `DB_VERSION = 8`.)
 
 ---
 
@@ -67,7 +67,7 @@ Definicje: [src/lib/types.ts](src/lib/types.ts). Kluczowe encje w `DB`:
 | Encja | Opis |
 | --- | --- |
 | `User` | klient lub admin (`role`). Hasło jawnie (demo). |
-| `Pet` | pupil: `breedId`, `weightKg`, opcjonalnie `lastGroomingDate` (data sprzed demo). |
+| `Pet` | pupil: `breedId`, `weightKg`, opcjonalnie `lastGroomingDate` (data sprzed demo) i `photoUrl` (zdjęcie pupila w `public/`, pokazywane w awatarze). |
 | `Appointment` | wizyta: `date` (YYYY-MM-DD), `time` (HH:MM), `durationMin`, `status` (`scheduled`/`completed`/`cancelled`). |
 | `Message` | wiadomość z formularza kontaktowego lub panelu klienta → skrzynka admina. |
 | `FollowUp` | wygenerowane przypomnienie w kolejce (`pending`/`sent`/`dismissed`). |
@@ -242,7 +242,11 @@ Pozostałe zakładki (`Messages`, `Visits`, `Clients`) bez zmian funkcjonalnych.
 ## 8. Komponenty i styl
 
 - [src/components/Icon.tsx](src/components/Icon.tsx) — własny zestaw konturowych SVG.
-  **W UI nie ma emoji** (poza treścią wzorca wiadomości); awatary = inicjały, statusy = plakietki.
+  **W UI nie ma emoji** (poza treścią wzorca wiadomości); statusy = plakietki. Awatar
+  (`Avatar`) domyślnie pokazuje inicjał imienia, a gdy pupil ma `photoUrl` — jego
+  **zdjęcie** (`.avatar-photo`, `object-fit: cover`), z powrotem do inicjału przy błędzie
+  ładowania. Zdjęcia pupili leżą w `public/photos/` (np. `pies-1.jpg`), tak jak fotografie
+  motywu „Stonowany".
 - [src/components/IconStonowany.tsx](src/components/IconStonowany.tsx) — drugi zestaw ikon
   (pełne sylwetki, wycięcia przez `fill-rule: evenodd`) dla motywu „Stonowany". Te same
   klucze `IconName`; brakujące nazwy spadają na wersję konturową.

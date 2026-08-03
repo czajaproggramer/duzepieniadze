@@ -1,0 +1,238 @@
+/* ============================================================
+   Panel administratora — oprawa użytkowa (functional).
+
+   Świadomie NIEZALEŻNA od motywów landingu. Panel admina nigdy nie
+   dostaje klasy `.theme-stonowany`; dodatkowo tutaj przemapowujemy
+   tokeny bazowe na neutralną paletę „narzędziową" (chłodna szarość +
+   funkcjonalny błękit), żeby konsola wyglądała jak narzędzie pracy,
+   a nie jak strona marketingowa — niezależnie od tego, jaki motyw
+   wybrał klient. Priorytet: kalendarz i przypomnienia.
+
+   Token'y neutralizujemy na `.admin-shell` (klasa na `.shell`), żeby objąć
+   też chrome: pasek demo, nawigację i stopkę. Reguły gęstości i układu
+   siedzą pod `.admin-console` (klasa na `.page` w Admin.tsx).
+   ============================================================ */
+
+/* Tło poza kontenerem (margines `body`) — neutralne, nie różowe/szałwiowe. */
+body.admin-mode {
+  background: #d7dce1;
+}
+
+.admin-shell {
+  /* powierzchnie */
+  --surface: #ffffff;
+  --cream: #eef1f4;
+  --cream-deep: #e6eaee;
+  --cream-line: #e2e5e9;
+
+  /* akcent użytkowy: błękit zamiast różu/szałwii */
+  --terracotta: #2f6fb0;
+  --terracotta-strong: #245a91;
+  --terracotta-soft: #bcd4ea;
+  --terracotta-tint: #eef4fa;
+
+  /* tusz */
+  --ink: #1e242b;
+  --ink-2: #2f353c;
+  --muted: #58616b;
+  --faint: #8a939d;
+  --line: #e2e5e9;
+  --line-dark: #2f353c;
+
+  /* status — standardowe, wyraźne */
+  --mint: #e4f3e7;
+  --mint-ink: #2c7a48;
+  --butter: #fbedcf;
+  --butter-ink: #8a6410;
+  --rose: #fbdedd;
+  --rose-ink: #b23430;
+
+  /* narzędziowo: nagłówki bezszeryfowe */
+  --serif: var(--sans);
+
+  box-shadow: 0 18px 48px rgba(30, 40, 55, 0.16);
+}
+
+/* Chrome panelu admina — bez różowej maści landingu, płaski pasek narzędzia. */
+.admin-shell .nav {
+  background: #fff;
+}
+
+.admin-shell .logo-mark {
+  background: #eef1f4;
+  color: var(--terracotta);
+}
+
+/* Płótno konsoli — chłodna szarość, karty białe. */
+.admin-console {
+  background: #f4f6f8;
+}
+
+/* Nagłówek strony — zwarty, bez ozdobnej kursywy */
+.admin-console .page-head h1 {
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  font-weight: 700;
+}
+
+.admin-console .accent {
+  font-style: normal;
+  color: var(--terracotta);
+}
+
+.admin-console .eyebrow {
+  color: var(--faint);
+}
+
+/* Zakładki jako pasek narzędzi — priorytetowe (kalendarz, przypomnienia)
+   siedzą pierwsze; zwarte i czytelne */
+.admin-console .tabs {
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.admin-console .tab {
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.admin-console .tab.active {
+  border-bottom-width: 2px;
+}
+
+/* Karty gęściejsze i bez zaokrągleń rodem z landingu */
+.admin-console .card {
+  border-radius: 10px;
+  box-shadow: none;
+  padding: 18px;
+}
+
+.admin-console .stat-row {
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-console .stat {
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fff;
+}
+
+.admin-console .stat b {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.admin-console .row-card {
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.admin-console .table-wrap {
+  border-radius: 10px;
+  background: #fff;
+}
+
+.admin-console .empty {
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* ——— pasek akcji silnika przypomnień ——— */
+.admin-console .engine-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.admin-console .engine-bar .engine-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.admin-console .engine-bar .engine-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.admin-console .engine-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.admin-console .engine-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+
+.admin-console .engine-dot.is-on {
+  background: #2c7a48;
+}
+
+/* ——— agenda dnia pod kalendarzem (kalendarz = priorytet) ——— */
+.admin-console .day-agenda {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.admin-console .day-agenda h4 {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.admin-console .agenda-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.admin-console .agenda-row:last-child {
+  border-bottom: none;
+}
+
+.admin-console .agenda-time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 96px;
+}
+
+.admin-console .agenda-main {
+  flex: 1;
+  min-width: 180px;
+}
+
+.admin-console .agenda-main .agenda-title {
+  font-weight: 600;
+}
+
+.admin-console .agenda-main .agenda-sub {
+  font-size: 0.82rem;
+  color: var(--faint);
+}
+
+.admin-console .agenda-row .row-actions {
+  margin-left: auto;
+}

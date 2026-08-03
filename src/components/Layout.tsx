@@ -6,23 +6,38 @@ import { LANDING_THEMES, useStore } from '../lib/store'
 import { Icon } from './Icon'
 import { IconS } from './IconStonowany'
 
+/** Panel administratora jest jedyną częścią serwisu niezależną od motywu —
+ *  ma stałą, użytkową oprawę. Cała reszta (landing, logowanie, rezerwacja,
+ *  panel klienta) podąża za wyborem motywu. */
+const UNTHEMED_PATHS = ['/admin']
+
 /**
- * Motyw obowiązuje wyłącznie na landingu (`/`). Panel klienta i panel admina
- * zawsze renderują się w bazowej oprawie — stąd `isLanding` w klasach.
+ * Motyw obowiązuje na całej części klienckiej serwisu (landing, logowanie,
+ * rezerwacja, panel klienta). Panel admina (`UNTHEMED_PATHS`) zawsze renderuje
+ * się w neutralnej, użytkowej oprawie niezależnej od motywu.
  */
 export function Layout({ children }: { children: ReactNode }) {
   const { theme } = useStore()
   const location = useLocation()
-  const stonowany = location.pathname === '/' && theme === 'stonowany'
+  const isAdmin = UNTHEMED_PATHS.includes(location.pathname)
+  const stonowany = !isAdmin && theme === 'stonowany'
 
-  // Tło poza `.shell` maluje `body`, więc klasa musi wylądować też tam.
+  // Tło poza `.shell` maluje `body`, więc klasa musi wylądować też tam:
+  // `motyw-stonowany` maluje na szałwię, `admin-mode` na neutralną szarość
+  // (żeby panel admina był w pełni oderwany od palety motywów).
   useEffect(() => {
     document.body.classList.toggle('motyw-stonowany', stonowany)
-    return () => document.body.classList.remove('motyw-stonowany')
-  }, [stonowany])
+    document.body.classList.toggle('admin-mode', isAdmin)
+    return () => {
+      document.body.classList.remove('motyw-stonowany')
+      document.body.classList.remove('admin-mode')
+    }
+  }, [stonowany, isAdmin])
 
   return (
-    <div className={`shell ${stonowany ? 'theme-stonowany' : ''}`}>
+    <div
+      className={`shell ${stonowany ? 'theme-stonowany' : ''} ${isAdmin ? 'admin-shell' : ''}`}
+    >
       <DemoBar />
       <Nav />
       <main>{children}</main>

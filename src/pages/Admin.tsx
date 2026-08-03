@@ -22,12 +22,14 @@ import type { PetSchedule } from '../lib/followups'
 import { plural, useStore } from '../lib/store'
 import type { Message, User } from '../lib/types'
 
-type Tab = 'przeglad' | 'klienci' | 'wizyty' | 'wiadomosci' | 'followupy'
+// Kolejność zakładek odwzorowuje priorytety panelu: najpierw kalendarz
+// i przypomnienia (funkcje kluczowe), potem reszta obsługi.
+type Tab = 'kalendarz' | 'followupy' | 'wiadomosci' | 'wizyty' | 'klienci'
 
 export function Admin() {
   const { db, user, isAdmin } = useStore()
   const navigate = useNavigate()
-  const [tab, setTab] = useState<Tab>('przeglad')
+  const [tab, setTab] = useState<Tab>('kalendarz')
 
   useEffect(() => {
     if (!user) navigate('/logowanie?powrot=/admin', { replace: true })
@@ -43,7 +45,7 @@ export function Admin() {
   const pendingFollowUps = db.followUps.filter((f) => f.status === 'pending').length
 
   return (
-    <div className="page">
+    <div className="page admin-console">
       <div className="container">
         <div className="page-head">
           <div>
@@ -60,32 +62,11 @@ export function Admin() {
 
         <div className="tabs">
           <button
-            className={`tab ${tab === 'przeglad' ? 'active' : ''}`}
-            onClick={() => setTab('przeglad')}
-          >
-            <Icon name="chart" size={17} />
-            Przegląd
-          </button>
-          <button
-            className={`tab ${tab === 'klienci' ? 'active' : ''}`}
-            onClick={() => setTab('klienci')}
-          >
-            <Icon name="users" size={17} />
-            Klienci <span className="count">{clients.length}</span>
-          </button>
-          <button
-            className={`tab ${tab === 'wizyty' ? 'active' : ''}`}
-            onClick={() => setTab('wizyty')}
+            className={`tab ${tab === 'kalendarz' ? 'active' : ''}`}
+            onClick={() => setTab('kalendarz')}
           >
             <Icon name="calendar" size={17} />
-            Wizyty <span className="count">{upcoming.length}</span>
-          </button>
-          <button
-            className={`tab ${tab === 'wiadomosci' ? 'active' : ''}`}
-            onClick={() => setTab('wiadomosci')}
-          >
-            <Icon name="mail" size={17} />
-            Wiadomości {unreadMessages > 0 && <span className="count">{unreadMessages}</span>}
+            Kalendarz
           </button>
           <button
             className={`tab ${tab === 'followupy' ? 'active' : ''}`}
@@ -95,53 +76,75 @@ export function Admin() {
             Przypomnienia{' '}
             {pendingFollowUps > 0 && <span className="count">{pendingFollowUps}</span>}
           </button>
+          <button
+            className={`tab ${tab === 'wiadomosci' ? 'active' : ''}`}
+            onClick={() => setTab('wiadomosci')}
+          >
+            <Icon name="mail" size={17} />
+            Wiadomości {unreadMessages > 0 && <span className="count">{unreadMessages}</span>}
+          </button>
+          <button
+            className={`tab ${tab === 'wizyty' ? 'active' : ''}`}
+            onClick={() => setTab('wizyty')}
+          >
+            <Icon name="clock" size={17} />
+            Wizyty <span className="count">{upcoming.length}</span>
+          </button>
+          <button
+            className={`tab ${tab === 'klienci' ? 'active' : ''}`}
+            onClick={() => setTab('klienci')}
+          >
+            <Icon name="users" size={17} />
+            Klienci <span className="count">{clients.length}</span>
+          </button>
         </div>
 
-        {tab === 'przeglad' && <Overview onGo={setTab} />}
-        {tab === 'klienci' && <Clients />}
-        {tab === 'wizyty' && <Visits />}
-        {tab === 'wiadomosci' && <Messages />}
+        {tab === 'kalendarz' && <CalendarTab onGo={setTab} />}
         {tab === 'followupy' && <Reminders />}
+        {tab === 'wiadomosci' && <Messages />}
+        {tab === 'wizyty' && <Visits />}
+        {tab === 'klienci' && <Clients />}
       </div>
     </div>
   )
 }
 
-/* ─────────────────────── PRZEGLĄD ─────────────────────── */
+/* ─────────────── KALENDARZ (widok wiodący) ─────────────── */
 
-function Overview({ onGo }: { onGo: (t: Tab) => void }) {
+/** Zakładka kalendarza: zwarty pasek liczb + kalendarz dnia z agendą
+ *  i szybkimi akcjami. To główny widok pracy salonu. */
+function CalendarTab({ onGo }: { onGo: (t: Tab) => void }) {
   const { db } = useStore()
   const today = todayISO()
 
-  const upcoming = db.appointments
-    .filter((a) => a.status === 'scheduled' && a.date >= today)
-    .sort((a, b) => (a.date + a.time > b.date + b.time ? 1 : -1))
+  const upcoming = db.appointments.filter((a) => a.status === 'scheduled' && a.date >= today)
   const revenue = db.appointments
     .filter((a) => a.status === 'completed')
     .reduce((sum, a) => sum + a.price, 0)
+  const pendingFollowUps = db.followUps.filter((f) => f.status === 'pending').length
 
   return (
     <>
       <div className="stat-row">
         <div className="stat">
-          <b>{db.users.filter((u) => u.role === 'client').length}</b>
-          <span>klientów</span>
-        </div>
-        <div className="stat">
-          <b>{db.pets.length}</b>
-          <span>profili pupili</span>
-        </div>
-        <div className="stat">
           <b>{upcoming.length}</b>
           <span>nadchodzących wizyt</span>
         </div>
         <div className="stat">
-          <b>{revenue} zł</b>
-          <span>z wizyt zrealizowanych</span>
-        </div>
-        <div className="stat">
           <b>{db.messages.filter((m) => !m.read).length}</b>
           <span>nieprzeczytanych wiadomości</span>
+        </div>
+        <div className="stat">
+          <b>{pendingFollowUps}</b>
+          <span>przypomnień w kolejce</span>
+        </div>
+        <div className="stat">
+          <b>{db.users.filter((u) => u.role === 'client').length}</b>
+          <span>klientów</span>
+        </div>
+        <div className="stat">
+          <b>{revenue} zł</b>
+          <span>z wizyt zrealizowanych</span>
         </div>
       </div>
 
@@ -156,7 +159,8 @@ function Overview({ onGo }: { onGo: (t: Tab) => void }) {
 const PX_PER_MIN = 0.9
 
 function DaySchedule({ onGo }: { onGo: (t: Tab) => void }) {
-  const { db } = useStore()
+  const { db, completeAppointment, cancelAppointment } = useStore()
+  const [toast, showToast] = useToast()
   const today = todayISO()
   const [day, setDay] = useState(today)
 
@@ -303,6 +307,65 @@ function DaySchedule({ onGo }: { onGo: (t: Tab) => void }) {
           </div>
         </div>
       )}
+
+      {/* Agenda dnia z szybkimi akcjami — obsługa wizyt bez wchodzenia
+          w osobną zakładkę. Kalendarz jest tu widokiem operacyjnym. */}
+      {hours && placed.length > 0 && (
+        <div className="day-agenda">
+          <h4>Agenda dnia</h4>
+          {placed.map(({ a, end }) => {
+            const pet = db.pets.find((p) => p.id === a.petId)
+            const client = db.users.find((u) => u.id === a.clientId)
+            return (
+              <div key={a.id} className="agenda-row">
+                <span className="agenda-time">
+                  {a.time}–{minutesToTime(end)}
+                </span>
+                <div className="agenda-main">
+                  <div className="agenda-title">
+                    {pet?.name ?? 'Pupil'} · {serviceById(a.serviceId)?.name}
+                    {a.status === 'completed' && (
+                      <span className="badge badge-mint" style={{ marginLeft: 8 }}>
+                        zrealizowana
+                      </span>
+                    )}
+                  </div>
+                  <div className="agenda-sub">
+                    {client?.name}
+                    {client?.phone ? ` · ${client.phone}` : ''} · {a.price} zł
+                  </div>
+                </div>
+                {a.status === 'scheduled' && (
+                  <div className="row-actions">
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => {
+                        completeAppointment(a.id)
+                        showToast('Wizyta oznaczona jako zrealizowana.')
+                      }}
+                    >
+                      <Icon name="check" size={14} />
+                      Zrealizowana
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => {
+                        if (confirm('Odwołać wizytę?')) {
+                          cancelAppointment(a.id)
+                          showToast('Wizyta odwołana.')
+                        }
+                      }}
+                    >
+                      Odwołaj
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+      {toast}
     </div>
   )
 }
@@ -761,10 +824,21 @@ const SAMPLE_SCHEDULE: PetSchedule = {
 const SENT_PER_PAGE = 5
 
 function Reminders() {
-  const { db, setLeadDays, setReminderTemplate } = useStore()
+  const {
+    db,
+    setLeadDays,
+    setReminderTemplate,
+    setAutoSend,
+    runFollowUpScan,
+    sendPendingFollowUps,
+  } = useStore()
+  const [toast, showToast] = useToast()
   const [template, setTemplate] = useState(db.settings.reminderTemplate ?? '')
   const [sentPage, setSentPage] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const pending = db.followUps.filter((f) => f.status === 'pending').length
+  const autoSend = db.settings.autoSendFollowUps
 
   useEffect(() => {
     setTemplate(db.settings.reminderTemplate ?? '')
@@ -814,6 +888,58 @@ function Reminders() {
 
   return (
     <>
+      {/* Sterowanie silnikiem przypomnień — priorytetowa funkcja panelu.
+          Wszystkie akcje już istnieją w store; tu dostają widoczny interfejs. */}
+      <div className="engine-bar">
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={autoSend}
+            onChange={(e) => setAutoSend(e.target.checked)}
+          />
+          <span className="track" />
+          Automatyczna wysyłka
+        </label>
+        <span className="engine-status">
+          <span className={`engine-dot ${autoSend ? 'is-on' : ''}`} />
+          {autoSend ? 'automat aktywny' : 'automat wyłączony'}
+        </span>
+        <span className="engine-status">
+          <span className="engine-pending">{pending}</span> w kolejce
+        </span>
+        <div className="engine-actions">
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => {
+              const r = runFollowUpScan()
+              showToast(
+                r.created > 0
+                  ? `Skan: dodano ${r.created} ${plural(r.created, 'przypomnienie', 'przypomnienia', 'przypomnień')} do kolejki.`
+                  : 'Skan zakończony — brak nowych przypomnień.',
+              )
+            }}
+          >
+            <Icon name="search" size={14} />
+            Skanuj teraz
+          </button>
+          <button
+            className="btn btn-primary btn-sm"
+            disabled={pending === 0}
+            onClick={() => {
+              const sentNow = sendPendingFollowUps()
+              showToast(
+                sentNow > 0
+                  ? `Wysłano ${sentNow} ${plural(sentNow, 'przypomnienie', 'przypomnienia', 'przypomnień')}.`
+                  : 'Brak przypomnień do wysłania.',
+              )
+            }}
+          >
+            <Icon name="send" size={14} />
+            Wyślij oczekujące
+          </button>
+        </div>
+      </div>
+
       <div className="card" style={{ marginBottom: 24 }}>
         <h3 className="mt-0 mb-0">Wzorzec przypomnienia</h3>
         <p className="text-muted small" style={{ maxWidth: '64ch' }}>
@@ -975,6 +1101,7 @@ function Reminders() {
           )}
         </>
       )}
+      {toast}
     </>
   )
 }

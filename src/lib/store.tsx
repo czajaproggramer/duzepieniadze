@@ -21,9 +21,10 @@ const THEME_KEY = 'salon-demo::motyw'
 /** Wariant oprawy landingu. Nie dotyczy panelu klienta ani admina. */
 export type LandingTheme = 'cukierkowy' | 'stonowany'
 
+// „Stonowany" jest motywem głównym (domyślnym) — stoi pierwszy na liście.
 export const LANDING_THEMES: { id: LandingTheme; label: string; hint: string }[] = [
-  { id: 'cukierkowy', label: 'Cukierkowy', hint: 'pudrowy róż, ilustracje, serif' },
   { id: 'stonowany', label: 'Stonowany', hint: 'szałwia, fotografie, grotesk' },
+  { id: 'cukierkowy', label: 'Cukierkowy', hint: 'pudrowy róż, ilustracje, serif' },
 ]
 
 interface StoreValue {
@@ -92,7 +93,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   )
   const [draft, setDraft] = useState<BookingDraft | null>(() => loadDraft())
   const [theme, setTheme] = useState<LandingTheme>(() =>
-    localStorage.getItem(THEME_KEY) === 'stonowany' ? 'stonowany' : 'cukierkowy',
+    // „Stonowany" to motyw domyślny; „Cukierkowy" tylko po jawnym wyborze.
+    localStorage.getItem(THEME_KEY) === 'cukierkowy' ? 'cukierkowy' : 'stonowany',
   )
   const bootRan = useRef(false)
 

@@ -37,6 +37,40 @@ body.motyw-stonowany {
   box-shadow: 0 30px 70px rgba(30, 36, 24, 0.22);
 }
 
+/* ——— przemapowanie tokenów bazowych na paletę „szałwii" ———
+   Dzięki temu współdzielone komponenty (karty, plakietki, zakładki, pola,
+   przyciski) w panelu klienta i w chrome landingu automatycznie przejmują
+   kolory motywu — bez przepisywania każdej reguły z osobna. Panel admina nie
+   dostaje klasy `.theme-stonowany`, więc pozostaje przy palecie bazowej. */
+.theme-stonowany {
+  --surface: var(--st-surface);
+  --cream: var(--st-cream);
+  --cream-deep: #ecebe3;
+  --cream-line: var(--st-line);
+
+  /* akcent marki: pudrowy róż → szałwia */
+  --terracotta: var(--st-sage);
+  --terracotta-strong: var(--st-sage-deep);
+  --terracotta-soft: #c3cfb4;
+  --terracotta-tint: var(--st-sage-soft);
+
+  --ink: var(--st-ink);
+  --ink-2: var(--st-ink-2);
+  --muted: var(--st-muted);
+  --faint: var(--st-faint);
+  --line: var(--st-line);
+  --line-dark: var(--st-dark);
+
+  /* status: zachowujemy trójpodział znaczeniowy, ale dostrajamy do szałwii
+     (zieleń = ok, bursztyn = zbliża się, glina = po terminie) — bez różu */
+  --mint: #dfeade;
+  --mint-ink: #40684a;
+  --butter: #efe6cd;
+  --butter-ink: #856b38;
+  --rose: #eed9cd;
+  --rose-ink: #9a5942;
+}
+
 /* ——— chrome: pasek demo, nawigacja, stopka ——— */
 
 .theme-stonowany .demo-bar {
@@ -662,6 +696,12 @@ body.motyw-stonowany {
 .st-about-photo {
   border-radius: var(--st-r-lg);
   overflow: hidden;
+}
+
+/* panel nachodzi na prawą krawędź zdjęcia — kadr przesuwamy w lewo,
+   żeby postać nie chowała się pod nim */
+.st-about-photo img {
+  object-position: 32% center;
 }
 
 .st-about-panel {
@@ -1469,4 +1509,84 @@ body.motyw-stonowany {
   background: var(--st-sage-soft);
   color: var(--st-sage-deep);
   border-radius: 10px;
+}
+
+/* ============================================================
+   Panel klienta („/konto") w oprawie „Stonowany".
+
+   Kolory dziedziczy z przemapowanych tokenów u góry pliku; tu tylko
+   dokładamy tożsamość motywu (grotesk w nagłówkach, akcent italic,
+   miększe promienie). Reguły scope'ujemy pod `.theme-stonowany .page`,
+   które trafia wyłącznie w panel klienta — landing używa klas `.st`,
+   a panel admina nie dostaje klasy `.theme-stonowany`.
+   ============================================================ */
+
+.theme-stonowany .page h1,
+.theme-stonowany .page h2,
+.theme-stonowany .page h3,
+.theme-stonowany .page h4 {
+  font-family: var(--sans);
+  letter-spacing: -0.005em;
+}
+
+.theme-stonowany .page h1 {
+  font-weight: 700;
+}
+
+/* akcent w „Cześć, Imię" — kursywa serif w kolorze szałwii */
+.theme-stonowany .page .accent {
+  font-family: var(--serif);
+  color: var(--st-sage-deep);
+}
+
+.theme-stonowany .page .eyebrow {
+  color: var(--st-sage);
+}
+
+/* zakładki: podkreślenie i licznik już są szałwiowe przez tokeny —
+   dodajemy tylko czytelniejszy stan aktywny */
+.theme-stonowany .page .tab.active {
+  color: var(--st-ink);
+}
+
+/* karty i wiersze: cieplejszy promień i delikatny cień motywu */
+.theme-stonowany .page .card,
+.theme-stonowany .page .row-card,
+.theme-stonowany .page .stat {
+  border-radius: var(--st-r);
+}
+
+.theme-stonowany .page .card {
+  box-shadow: 0 12px 28px rgba(30, 36, 24, 0.06);
+}
+
+/* nieprzeczytane / wyróżnione wiersze — szałwiowy akcent zamiast różu */
+.theme-stonowany .page .row-card.unread {
+  border-color: var(--st-sage);
+  background: var(--st-sage-soft);
+}
+
+.theme-stonowany .page .info-note {
+  background: var(--st-cream);
+}
+
+/* pola formularza profilu — spójne z formularzem kontaktu na landingu */
+.theme-stonowany .page .field label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--st-faint);
+}
+
+.theme-stonowany .page .field input,
+.theme-stonowany .page .field select,
+.theme-stonowany .page .field textarea {
+  border-radius: 10px;
+}
+
+/* pusty stan (skrzynka/wizyty) — miększa ramka motywu */
+.theme-stonowany .page .empty {
+  border-color: var(--st-line);
+  border-radius: var(--st-r-lg);
 }

@@ -148,7 +148,7 @@ function About() {
       <div className="container">
         <div className="st-about">
           <div className="st-about-photo">
-            <Photo photo={PHOTOS.oMnie} ratio="4 / 5" />
+            <Photo photo={PHOTOS.oMnie} ratio="3 / 4" />
           </div>
 
           <div className="st-about-panel">

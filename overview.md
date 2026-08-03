@@ -4,9 +4,12 @@ Dokument techniczny opisujący, **jak działa aplikacja**. Uzupełnia [README.md
 (który jest bardziej marketingowo-funkcjonalny). Utrzymuj ten plik na bieżąco — patrz
 instrukcja w [CLAUDE.md](CLAUDE.md).
 
-> Ostatnia istotna zmiana: landing ma **dwa motywy** — „Cukierkowy" (dotychczasowy)
-> i „Stonowany" (nowy układ, fotografie, drugi zestaw ikon), przełączane z nawigacji
-> rozwijanym menu „Motywy" (patrz §4a).
+> Ostatnia istotna zmiana: **„Stonowany" jest motywem głównym (domyślnym)** i obejmuje
+> teraz **całą część kliencką** (landing, logowanie, rezerwacja, panel klienta), nie tylko
+> landing. **Panel admina jest w pełni niezależny od motywów** — ma osobną, neutralną
+> oprawę użytkową (`.admin-shell`/`.admin-console`, [styles-admin.css](src/styles-admin.css))
+> i został przeorganizowany funkcjonalnie: zakładki wiodą kalendarzem i przypomnieniami
+> (patrz §4a i §7).
 
 ---
 
@@ -90,43 +93,58 @@ nawigacja (linki do sekcji landingu + panel/konto zależnie od roli), stopka.
 | `/rezerwacja` | [Booking](src/pages/Booking.tsx) — kreator 4-krokowy: pupil → usługa → termin → potwierdzenie | publiczna (wymaga konta do finalizacji) |
 | `/logowanie` | [Login](src/pages/Login.tsx) — logowanie/rejestracja, przyciski kont demo | publiczna |
 | `/konto` | [Account](src/pages/Account.tsx) — wizyty, profile pupili, skrzynka przypomnień, dane | klient |
-| `/admin` | [Admin](src/pages/Admin.tsx) — przegląd, klienci, wizyty, wiadomości, przypomnienia | admin |
+| `/admin` | [Admin](src/pages/Admin.tsx) — konsola użytkowa: kalendarz, przypomnienia, wiadomości, wizyty, klienci (patrz §7) | admin |
 
 Brak twardego guardu tras — strony renderują treść zależnie od `user`/`isAdmin` ze store.
 
 ---
 
-## 4a. Motywy landingu
+## 4a. Motywy części klienckiej
 
-Landing renderuje się w jednej z **dwóch opraw**. Wybór trzyma store (`theme`,
-`setTheme`, typ `LandingTheme` w [store.tsx](src/lib/store.tsx)), persystencja pod
+Część kliencka serwisu renderuje się w jednej z **dwóch opraw**. Wybór trzyma store
+(`theme`, `setTheme`, typ `LandingTheme` w [store.tsx](src/lib/store.tsx)), persystencja pod
 `localStorage['salon-demo::motyw']` — **poza `DB`**, więc „Zresetuj dane" jej nie kasuje
-i zmiana nie wymaga podbicia `DB_VERSION`. Lista wariantów: `LANDING_THEMES`.
+i zmiana nie wymaga podbicia `DB_VERSION`. Lista wariantów: `LANDING_THEMES`
+(**`stonowany` jest pierwszy = główny/domyślny**).
 
 | Motyw | Plik | Charakterystyka |
 | --- | --- | --- |
-| `cukierkowy` (domyślny) | `HomeCukierkowy` w [Home.tsx](src/pages/Home.tsx) | pudrowy róż, serif w nagłówkach, ilustracje SVG (`DogArt`), ikony konturowe (`Icon.tsx`), karty i pigułki |
-| `stonowany` | [HomeStonowany.tsx](src/pages/HomeStonowany.tsx) | szałwia + kamień, grotesk w nagłówkach (serif italic tylko jako akcent), **fotografie**, ikony pełne (`IconStonowany.tsx`), układ edytorski: hero split, kolumna zdjęcia przy usługach, nachodzący panel „O mnie", ciemna sekcja kalkulatora, cennik jako lista wierszy, pas zdjęć |
+| `stonowany` (**domyślny**) | [HomeStonowany.tsx](src/pages/HomeStonowany.tsx) | szałwia + kamień, grotesk w nagłówkach (serif italic tylko jako akcent), **fotografie**, ikony pełne (`IconStonowany.tsx`), układ edytorski: hero split, kolumna zdjęcia przy usługach, nachodzący panel „O mnie", ciemna sekcja kalkulatora, cennik jako lista wierszy, pas zdjęć |
+| `cukierkowy` | `HomeCukierkowy` w [Home.tsx](src/pages/Home.tsx) | pudrowy róż, serif w nagłówkach, ilustracje SVG (`DogArt`), ikony konturowe (`Icon.tsx`), karty i pigułki |
 
 **Zasady:**
 - **Treść jest 1:1 w obu motywach.** Motyw zmienia wyłącznie układ, typografię, ikony
   i materiał wizualny — nigdy copy. Teksty powtarzalne (lista „co obejmuje wizyta",
   „dlaczego my", ikony kategorii cennika) siedzą w [src/data/landing.ts](src/data/landing.ts),
   żeby warianty nie mogły się rozjechać. Resztę trzymaj zgodną ręcznie.
-- **Motyw dotyczy tylko `/`.** [Layout](src/components/Layout.tsx) nakłada klasy
-  `theme-stonowany` (na `.shell`) i `motyw-stonowany` (na `body` — maluje tło poza
-  kontenerem) wyłącznie gdy `pathname === '/'`. Panel klienta, panel admina i rezerwacja
-  zawsze wyglądają tak samo.
+- **Domyślny motyw = `stonowany`.** Store startuje na `stonowany`, a `cukierkowy`
+  włącza się dopiero po jawnym wyborze (`localStorage['…::motyw'] === 'cukierkowy'`).
+- **Motyw obejmuje całą część kliencką, nie tylko landing.** [Layout](src/components/Layout.tsx)
+  nakłada klasy `theme-stonowany` (na `.shell`) i `motyw-stonowany` (na `body`) na
+  **każdej ścieżce poza `/admin`** (stała `UNTHEMED_PATHS`) — landing, logowanie,
+  rezerwacja i **panel klienta** podążają za wyborem. **Panel admina jest wyjątkiem:**
+  ma własną, neutralną oprawę niezależną od motywu (patrz §7).
+- **Reskin panelu klienta bez przepisywania komponentów:** motyw `stonowany`
+  **przemapowuje tokeny bazowe** (`--surface`, `--terracotta`, `--ink`, `--line`,
+  status…) na paletę szałwii u góry [styles-stonowany.css](src/styles-stonowany.css),
+  więc współdzielone `.card`/`.badge`/`.tab`/`.field` przejmują kolory automatycznie.
+  Reguły specyficzne dla panelu scope'owane są pod `.theme-stonowany .page`
+  (trafia tylko w `/konto`/`/rezerwacja`/`/logowanie` — landing używa klas `.st`,
+  admin nie ma klasy `theme-stonowany`).
 - **Przełącznik:** komponent `ThemeMenu` w `Layout.tsx` — rozwijane menu „Motywy"
-  w nawigacji, obok kotwic sekcji (czyli też tylko na landingu).
+  w nawigacji, widoczne tylko na landingu (`/`). Wybór persystuje i obowiązuje we
+  wszystkich widokach klienckich.
 - **Style:** osobny arkusz [src/styles-stonowany.css](src/styles-stonowany.css),
   wszystko pod `.theme-stonowany` / `.st`. Klasy landingu mają prefiks `st-`.
 
 ### Zdjęcia motywu „Stonowany"
 
 Sloty zdjęć: [src/data/photos.ts](src/data/photos.ts); pliki wrzuca się do
-`public/photos/`. Komponent [Photo.tsx](src/components/Photo.tsx) przy braku pliku
-(`onError`) pokazuje neutralny kadr-placeholder, więc układ nie sypie się bez zdjęć.
+**`public/photos/`** (nie do `dist/` — to katalog builda, kasowany przy `npm run build`).
+Komponent [Photo.tsx](src/components/Photo.tsx) przy braku pliku (`onError`) pokazuje
+neutralny kadr-placeholder, więc układ nie sypie się bez zdjęć. Oryginały z generatora
+(~2 MB/szt.) leżą poza repo w `zdjecia-zrodlowe/` (w `.gitignore`); do `public/photos/`
+trafiają wersje skompresowane (`sips -s formatOptions 78`, ~250 kB/szt.).
 Prompty do wygenerowania każdego ujęcia (Nano Banana) leżą w
 [public/photos/PROMPTY.md](public/photos/PROMPTY.md) — nazwy plików muszą się zgadzać
 z `photos.ts`. `BeforeAfter` przyjmuje `media="zdjecie"` i wtedy zamiast `DogArt`
@@ -179,31 +197,45 @@ Wzorzec trzymany jest w `settings.reminderTemplate` (edytowalny w panelu admina)
 
 ---
 
-## 7. Panel admina — zakładka „Przypomnienia"
+## 7. Panel admina — konsola użytkowa (niezależna od motywu)
 
-Komponent `Reminders` w [src/pages/Admin.tsx](src/pages/Admin.tsx). Zawiera:
-- **Okienko ustawień** (na górze): `<textarea>` z wzorcem wiadomości + pasek przycisków
-  wstawiających zmienne (`REMINDER_VARIABLES`), select **wyprzedzenia** (`leadDays`:
-  0/3/7/14 dni), przycisk „Zapisz wzorzec" i **podgląd na żywo** na przykładowym psie.
-- **Tabela „Psy po terminie"** — tylko psy w stanie `po-terminie` bez umówionej wizyty,
-  z wyrenderowaną treścią przypomnienia dla każdego.
-- **Lista „Ostatnio wysłane przypomnienia"** — wysłane follow-upy (`status === 'sent'`)
-  posortowane malejąco po `sentAt`, z **paginacją po `SENT_PER_PAGE = 5`** na stronę
-  (stan `sentPage`, `currentSentPage` klamrowany do zakresu; pager `.reminder-pager`
-  chowa się przy jednej stronie). Każda karta: awatar psa, właściciel, `formatStamp(sentAt)`,
-  `automat`/`ręcznie`, treść i plakietka „dostarczone".
+[src/pages/Admin.tsx](src/pages/Admin.tsx). Panel jest **świadomie oderwany od motywów**
+części klienckiej i przeorganizowany **pod funkcję, nie estetykę**. Priorytet: **kalendarz
+i przypomnienia** — stoją jako pierwsze zakładki.
 
-Wzorzec zapisuje się przez `setReminderTemplate` (na blur i przyciskiem). Lokalny stan
-`template` ma fallback `?? ''`, a `renderReminderTemplate` zabezpiecza `undefined`.
+**Oprawa (theme-independent).** [Layout](src/components/Layout.tsx) na `/admin` **nie**
+nakłada `theme-stonowany`, za to dodaje klasę `admin-shell` (na `.shell`) oraz `admin-mode`
+(na `body`). Arkusz [src/styles-admin.css](src/styles-admin.css) przemapowuje pod
+`.admin-shell` tokeny bazowe na **neutralną paletę narzędziową** (chłodna szarość + funkcjonalny
+błękit, `--serif → --sans`), więc chrome (pasek demo, nawigacja, stopka) i treść panelu tracą
+róż/szałwię niezależnie od wyboru klienta. Sam `.page` panelu ma dodatkowo klasę
+`admin-console` — trzyma reguły gęstości i układ specyficzny dla konsoli. **Nie zależy od
+`DB_VERSION`.**
 
-**Kalendarz dnia** (`DaySchedule` w tym samym pliku): oś godzinowa z blokami wizyt
-pozycjonowanymi wg `PX_PER_MIN = 0.9`. Krótkie wizyty mają skrócony układ, żeby tekst
-się nie przycinał:
+**Zakładki** (`Tab`, kolejność = priorytet): `kalendarz` → `followupy` → `wiadomosci` →
+`wizyty` → `klienci`. Domyślna: `kalendarz`.
+
+**Zakładka „Kalendarz"** (`CalendarTab` + `DaySchedule`): zwarty pasek liczb (nadchodzące
+wizyty, nieprzeczytane wiadomości, przypomnienia w kolejce, klienci, przychód) + **kalendarz
+dnia jako widok wiodący**. `DaySchedule` to oś godzinowa z blokami wizyt (`PX_PER_MIN = 0.9`)
+oraz — pod osią — **agenda dnia z szybkimi akcjami** (`.day-agenda`/`.agenda-row`): dla wizyt
+`scheduled` przyciski „Zrealizowana" (`completeAppointment`) i „Odwołaj" (`cancelAppointment`),
+bez wchodzenia w osobną zakładkę. Bloki osi mają skrócony układ, gdy są niskie:
 - `height < 52 px` → `is-compact`: godzina + pies·usługa w **jednej linii** (`.daycal-event-row`);
 - `52–72 px` → dwie linie (zakres godzin + tytuł), **właściciel schodzi do tooltipa**;
-- `≥ 72 px` → pełny układ trzech linii (godziny, tytuł, właściciel).
+- `≥ 72 px` → pełny układ trzech linii. CSS: reguły `.daycal-*` w [styles.css](src/styles.css).
 
-CSS bloków: reguły `.daycal-*` w [src/styles.css](src/styles.css).
+**Zakładka „Przypomnienia"** (`Reminders`): na górze **pasek silnika** (`.engine-bar`) —
+przełącznik **automatycznej wysyłki** (`setAutoSend`), status automatu, licznik „w kolejce",
+przyciski **„Skanuj teraz"** (`runFollowUpScan`) i **„Wyślij oczekujące"** (`sendPendingFollowUps`,
+wyłączony przy zerowej kolejce). Niżej bez zmian: okienko wzorca (`<textarea>` +
+`REMINDER_VARIABLES`, select `leadDays` 0/3/7/14, podgląd na żywo), **tabela „Psy po terminie"**
+(stan `po-terminie` bez umówionej wizyty) i **lista „Ostatnio wysłane"** (`status === 'sent'`,
+malejąco po `sentAt`, **paginacja `SENT_PER_PAGE = 5`**, pager `.reminder-pager`). Wzorzec
+zapisuje `setReminderTemplate` (na blur i przyciskiem); `template` ma fallback `?? ''`,
+`renderReminderTemplate` zabezpiecza `undefined`.
+
+Pozostałe zakładki (`Messages`, `Visits`, `Clients`) bez zmian funkcjonalnych.
 
 ---
 
@@ -226,7 +258,11 @@ CSS bloków: reguły `.daycal-*` w [src/styles.css](src/styles.css).
   Pudrowy róż `#d98996` (akcent + rama `#e8b8be`), kremowo-różowa biel, soft charcoal CTA.
   Playfair Display / Manrope / Caveat. Drugi arkusz,
   [src/styles-stonowany.css](src/styles-stonowany.css), dokłada motyw „Stonowany"
-  (szałwia `#7d9068`, kamień, ciemne pasy) — wyłącznie pod `.theme-stonowany` / `.st`.
+  (szałwia `#7d9068`, kamień, ciemne pasy) — pod `.theme-stonowany` / `.st`; na górze
+  **przemapowuje tokeny bazowe**, dzięki czemu reskinuje też panel klienta (§4a). Trzeci
+  arkusz, [src/styles-admin.css](src/styles-admin.css), daje panelowi admina neutralną
+  oprawę użytkową (błękit `#2f6fb0` + chłodna szarość) pod `.admin-shell` / `.admin-console`
+  — niezależną od motywów (§7).
 
 ---
 

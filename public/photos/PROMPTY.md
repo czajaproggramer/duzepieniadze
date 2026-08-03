@@ -9,6 +9,27 @@ kadr-placeholder i układ strony pozostaje poprawny — nic się nie sypie.
 
 Mapowanie nazw plików na miejsca w kodzie: [src/data/photos.ts](../../src/data/photos.ts).
 
+## Stan (uzupełniaj przy dodawaniu zdjęć)
+
+Gotowe: `hero`, `uslugi`, `o-mnie`, `kalkulator`, `dlaczego-1..4`, `galeria-1..4`,
+`kontakt`, `przed-fibi` + `po-fibi`.
+
+Brakuje (na razie placeholdery): metamorfozy dla pozostałych psów — `przed-luna`/`po-luna`,
+`przed-kiki`/`po-kiki`, `przed-bruno`/`po-bruno`.
+
+> Uwaga do „Dlaczego": karta 3 „Rezerwacja online" używa `dlaczego-3.jpg` = kadr z
+> kalendarzem/telefonem, a karta 4 „Przypomnienia" `dlaczego-4.jpg` = wystrzyżony pies na
+> wprost (to samo ujęcie co `galeria-4.jpg`). Podmieniając te pliki, trzymaj się tej treści,
+> żeby zdjęcie pasowało do podpisu.
+
+**Przed wrzuceniem skompresuj** — pliki prosto z generatora ważą ~2 MB, na landing to
+za dużo. Oryginały trzymamy poza repo w `zdjecia-zrodlowe/` (w `.gitignore`), a do
+`public/photos/` trafia wersja zoptymalizowana:
+
+```bash
+sips -s format jpeg -s formatOptions 78 zdjecia-zrodlowe/NAZWA.jpg --out public/photos/NAZWA.jpg
+```
+
 ## Wspólny styl (dopisz do każdego promptu)
 
 > Photographic style: natural documentary photography, soft diffused daylight from a

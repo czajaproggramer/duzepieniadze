@@ -5,6 +5,7 @@ import { App } from './App'
 import { StoreProvider } from './lib/store'
 import './styles.css'
 import './styles-stonowany.css'
+import './styles-admin.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

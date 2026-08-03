@@ -4,3 +4,6 @@ dist
 *.local
 .wrangler
 .dev.vars
+
+# oryginały zdjęć (nieskompresowane) — do public/photos/ trafiają wersje zoptymalizowane
+zdjecia-zrodlowe

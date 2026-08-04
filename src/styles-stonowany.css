@@ -94,7 +94,7 @@ body.motyw-stonowany {
 }
 
 /* rozwinięte menu mobilne rośnie w dół — nie może zostać przy stałej wysokości */
-@media (max-width: 940px) {
+@media (max-width: 1120px) {
   .theme-stonowany .nav-inner {
     height: auto;
   }

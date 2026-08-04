@@ -570,7 +570,7 @@ textarea {
 .nav-inner {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   height: 78px;
 }
 
@@ -605,13 +605,14 @@ textarea {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .nav-links a,
 .nav-links button.linklike {
-  padding: 8px 14px;
+  padding: 8px 6px;
   border: none;
   background: none;
   border-radius: var(--r-pill);
@@ -635,8 +636,12 @@ textarea {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex-shrink: 0;
+}
+
+.nav-actions .btn {
+  padding: 9px 10px;
 }
 
 .nav-actions--end {
@@ -670,14 +675,14 @@ textarea {
   place-items: center;
 }
 
-@media (max-width: 940px) {
+@media (max-width: 1120px) {
   .nav-toggle {
     display: grid;
   }
   .nav-inner {
     flex-wrap: wrap;
     height: auto;
-    padding: 16px 0;
+    padding: 16px 18px;
   }
   .nav-links,
   .nav-actions {
@@ -697,6 +702,9 @@ textarea {
   }
   .nav-menu-open .nav-actions {
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
     margin-top: 10px;
   }
   .nav-menu-open .nav-actions .btn {
@@ -2497,7 +2505,7 @@ tbody tr:last-child td {
   color: var(--faint);
 }
 
-@media (max-width: 940px) {
+@media (max-width: 1120px) {
   .theme-menu-pop {
     position: static;
     transform: none;

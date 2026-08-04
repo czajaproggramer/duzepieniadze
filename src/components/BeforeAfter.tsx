@@ -22,30 +22,6 @@ const CASES: Case[] = [
     style: 'shihtzu',
     note: 'Skrócona grzywka, wyczesane kołtuny za uszami, wymodelowana główka.',
   },
-  {
-    id: 'luna',
-    label: 'Luna · Maltipoo',
-    dog: 'Luna',
-    palette: 'apricot',
-    style: 'poodle',
-    note: 'Strzyżenie misiowe nożyczkowe, wyrównane łapki i pyszczek.',
-  },
-  {
-    id: 'kiki',
-    label: 'Kiki · Maltańczyk',
-    dog: 'Kiki',
-    palette: 'snow',
-    style: 'shihtzu',
-    note: 'Kąpiel rozjaśniająca, pielęgnacja okolic oczu, jedwabista okrywa.',
-  },
-  {
-    id: 'bruno',
-    label: 'Bruno · Cocker Spaniel',
-    dog: 'Bruno',
-    palette: 'chocolate',
-    style: 'cocker',
-    note: 'Trymowanie piór, odciążone uszy, dokładne osuszenie kanałów usznych.',
-  },
 ]
 
 /**
@@ -116,20 +92,22 @@ export function BeforeAfter({ media = 'ilustracja' }: { media?: 'ilustracja' | '
         </div>
       </div>
 
-      <div className="ba-tabs">
-        {CASES.map((c, i) => (
-          <button
-            key={c.id}
-            className={`ba-tab ${i === active ? 'active' : ''}`}
-            onClick={() => {
-              setActive(i)
-              setSplit(50)
-            }}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
+      {CASES.length > 1 && (
+        <div className="ba-tabs">
+          {CASES.map((c, i) => (
+            <button
+              key={c.id}
+              className={`ba-tab ${i === active ? 'active' : ''}`}
+              onClick={() => {
+                setActive(i)
+                setSplit(50)
+              }}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <p className="text-center text-muted mt-2 small">
         <strong>{current.dog}:</strong> {current.note}

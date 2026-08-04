@@ -50,16 +50,4 @@ export const BEFORE_AFTER_PHOTOS: Record<string, { before: PhotoSlot; after: Pho
     before: { src: '/photos/przed-fibi.jpg', alt: 'Fibi przed strzyżeniem' },
     after: { src: '/photos/po-fibi.jpg', alt: 'Fibi po strzyżeniu' },
   },
-  luna: {
-    before: { src: '/photos/przed-luna.jpg', alt: 'Luna przed strzyżeniem' },
-    after: { src: '/photos/po-luna.jpg', alt: 'Luna po strzyżeniu' },
-  },
-  kiki: {
-    before: { src: '/photos/przed-kiki.jpg', alt: 'Kiki przed strzyżeniem' },
-    after: { src: '/photos/po-kiki.jpg', alt: 'Kiki po strzyżeniu' },
-  },
-  bruno: {
-    before: { src: '/photos/przed-bruno.jpg', alt: 'Bruno przed strzyżeniem' },
-    after: { src: '/photos/po-bruno.jpg', alt: 'Bruno po strzyżeniu' },
-  },
 }
